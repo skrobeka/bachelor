@@ -12,7 +12,10 @@ data class Book(
     val bookTitle: String,
     val bookAuthor: String,
     val locationId: Int,
+    val bookIsRead: Boolean = false,
+    val bookIsFavorite: Boolean = false,
     val bookAddedDate: Date = Date(),
+    val bookEdition: String? = null,
 
     @Embedded val picture: Picture? = null,
 )
