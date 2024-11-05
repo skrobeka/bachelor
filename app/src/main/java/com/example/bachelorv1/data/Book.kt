@@ -14,8 +14,8 @@ data class Book(
     val locationId: Int,
     val bookIsRead: Boolean = false,
     val bookIsFavorite: Boolean = false,
-    val bookAddedDate: String,
+    val bookAddedDate: Date = Date(),
     val bookEdition: String? = null,
 
-    @Embedded val picture: Picture? = null
+    @Embedded val picture: Picture? = null,
 )

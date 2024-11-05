@@ -2,8 +2,8 @@ package com.example.bachelorv1.data
 
 import androidx.room.Entity
 
-@Entity(primaryKeys = ["bookId", "genreId"],tableName = "BookGenre")
+@Entity(primaryKeys = ["book_id", "genre_id"],tableName = "BookGenre")
 data class BookGenreCrossRef(
-    val bookId: Int,
-    val genreId: Int
+    val book: Book,
+    val genre: Genre
 )

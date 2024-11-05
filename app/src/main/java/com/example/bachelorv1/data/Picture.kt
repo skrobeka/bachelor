@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class Picture(
     @PrimaryKey(autoGenerate = true)
     val pictureId: Int = 0,
+    val bookId: Int,
     val picturePath: String
 )
