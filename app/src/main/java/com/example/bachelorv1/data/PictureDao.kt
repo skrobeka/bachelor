@@ -15,8 +15,4 @@ interface PictureDao {
     @Delete
     suspend fun deletePicture(picture: Picture)
 
-    //Queries
-    @Query("SELECT picturePath FROM picture WHERE bookId = :bookId")
-    fun getPicturesByBook(bookId: Int): LiveData<Picture>
-
 }

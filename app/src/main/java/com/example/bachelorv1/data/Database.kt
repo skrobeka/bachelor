@@ -10,12 +10,9 @@ import androidx.room.RoomDatabase
 
 abstract class Database: RoomDatabase() {
 
-    abstract fun bookDao(): BookDao
-
-    abstract fun locationDao(): LocationDao
-
-    abstract fun genreDao(): GenreDao
-
-    abstract fun pictureDao(): PictureDao
+    abstract val bookDao: BookDao
+    abstract val genreDao: GenreDao
+    abstract val locationDao: LocationDao
+    abstract val pictureDao: PictureDao
 
 }
