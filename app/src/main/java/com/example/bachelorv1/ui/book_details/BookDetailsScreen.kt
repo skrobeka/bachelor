@@ -55,7 +55,7 @@ fun BookDetailsScreen(
         ) {
             Image(
                 modifier = Modifier
-                    .size(width = 128.dp, height = 192.dp)
+                    .size(width = 144.dp, height = 192.dp)
                     .clip(MaterialTheme.shapes.small),
                 contentScale = ContentScale.FillHeight,
                 painter = painterResource(R.drawable.test_pic),
