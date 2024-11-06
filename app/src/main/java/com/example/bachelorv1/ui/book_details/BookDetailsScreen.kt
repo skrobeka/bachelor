@@ -78,7 +78,11 @@ fun BookDetailsScreen(
             }
         }
 
+        Spacer(modifier = Modifier.height(32.dp))
+
         /*Middle part of the app */
+
+
 
 
     }
