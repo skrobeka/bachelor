@@ -19,24 +19,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BachelorV1Theme {
-                val navController = rememberNavController()
-                NavHost(
-                    navController = navController,
-                    startDestination = "book_list_screen"
-                ) {
-                    composable("book_list_screen") {
-                        BookListScreen(navController = navController)
-                    }
-                    composable("book_details_screen") {
-                        BookDetailsScreen(navController = navController)
-                    }
-                    composable("room_list_screen") {
-                        RoomListScreen(navController = navController)
-                    }
-                    composable("add_book_screen") {
-                        AddBookScreen(navController = navController)
-                    }
-                }
+                BookDetailsScreen()
             }
         }
     }

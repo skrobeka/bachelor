@@ -1,5 +1,6 @@
 package com.example.bachelorv1.ui.book_details
 
+import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -39,6 +41,7 @@ fun BookDetailsScreen(
             .padding(horizontal = 16.dp, vertical = 32.dp)
     ) {
         /*Top part of the app */
+
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -52,6 +55,7 @@ fun BookDetailsScreen(
                 painter = painterResource(R.drawable.book_details_screen),
                 contentDescription = null
             )
+
             Spacer(modifier = Modifier.width(32.dp))
 
             Column(
@@ -65,7 +69,9 @@ fun BookDetailsScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = "Author name", style = MaterialTheme.typography.titleMedium)
                 }
+
                 Spacer(modifier = Modifier.height(32.dp))
+
                 Button(
                     modifier = Modifier
                         .fillMaxWidth(),
@@ -82,8 +88,38 @@ fun BookDetailsScreen(
 
         /*Middle part of the app */
 
+        Column (
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Button(
+                    modifier = Modifier
+                        .weight(1f),
+                    onClick = {/*Add a photo*/}
+                ) {
+                    Icon(painterResource(R.drawable.add_a_photo), contentDescription = "Add a photo")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "Add a photo", style = MaterialTheme.typography.labelMedium)
+                }
 
+                Spacer(modifier = Modifier.width(32.dp))
 
+                Button(
+                    modifier = Modifier
+                        .weight(1f),
+                    onClick = {/*Delete book*/}
+                ) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete book")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "Delete book", style = MaterialTheme.typography.labelMedium)
+                }
+            }
+        }
 
     }
 }
