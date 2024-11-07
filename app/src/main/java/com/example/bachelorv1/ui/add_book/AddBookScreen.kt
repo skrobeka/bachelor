@@ -4,20 +4,24 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -57,7 +61,7 @@ fun AddBookScreen(
             )
         }
 
-        Spacer(modifier = Modifier.padding(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Row(
             modifier = Modifier
@@ -75,7 +79,7 @@ fun AddBookScreen(
             }
         }
 
-        Spacer(modifier = Modifier.padding(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Column(
             modifier = Modifier
@@ -92,9 +96,9 @@ fun AddBookScreen(
                 ) {
                     TextField(
                         modifier = Modifier
-                            .background(Color.LightGray, MaterialTheme.shapes.small)
-                            .fillMaxWidth(),
-                        value = "",
+                            .fillMaxWidth()
+                            .background(Color.LightGray, MaterialTheme.shapes.small),
+                        value = "Input",
                         onValueChange = {},
                         label = { Text("Book title") }
                     )
@@ -108,16 +112,84 @@ fun AddBookScreen(
                 ) {
                     TextField(
                         modifier = Modifier
-                            .background(Color.LightGray, MaterialTheme.shapes.small)
-                            .fillMaxWidth(),
-                        value = "",
+                            .fillMaxWidth()
+                            .background(Color.LightGray, MaterialTheme.shapes.small),
+                        value = "Input",
                         onValueChange = {},
                         label = { Text("Author's name") }
                     )
                 }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Box {
+                        TextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.LightGray, MaterialTheme.shapes.small)
+                                .clickable { /*Expanding menu*/ },
+                            value = "Input",
+                            onValueChange = {},
+                            label = { Text("Genres") },
+                            readOnly = true,
+                            trailingIcon = { IconButton(onClick = { /*Expanding menu*/ }) { Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Genres list") } }
+                        )
+                        DropdownMenu(
+                            expanded = false,
+                            onDismissRequest = { /*Expanding menu*/ }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Genre 1") },
+                                onClick = { /*Genre 1*/ }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Genreeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee 2") },
+                                onClick = { /*Genre 2*/ }
+                            )
+                        }
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Box {
+                        TextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.LightGray, MaterialTheme.shapes.small)
+                                .clickable { /*Expanding menu*/ },
+                            value = "Input",
+                            onValueChange = {},
+                            label = { Text("Location") },
+                            readOnly = true,
+                            trailingIcon = { IconButton(onClick = { /*Expanding menu*/ }) { Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Locations list") } }
+                        )
+                        DropdownMenu(
+                            expanded = false,
+                            onDismissRequest = { /*Expanding menu*/ }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Shelf 1") },
+                                onClick = { /*Shelf 1*/ }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Shelf 2") },
+                                onClick = { /*Shelf 2*/ }
+                            )
+                        }
+                    }
+                }
             }
             
-            Spacer(modifier = Modifier.padding(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Row(
                 modifier = Modifier
