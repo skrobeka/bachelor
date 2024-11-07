@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BachelorV1Theme {
-                AddBookScreen()
+                RoomListScreen()
             }
         }
     }
