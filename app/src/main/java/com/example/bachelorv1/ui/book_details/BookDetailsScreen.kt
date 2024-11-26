@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -33,18 +34,21 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.bachelorv1.R
 import com.example.bachelorv1.ui.theme.BachelorV1Theme
 
 @Composable
 fun BookDetailsScreen(
-    //navController: NavController,
-    //book: Book?
+    navController: NavController,
+    viewModel: BookDetailsViewModel
 ) {
+    val genres = viewModel.getBookGenreNames()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 32.dp)
+            .padding(top = 48.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
     ) {
         /*Top part of the screen*/
 
@@ -71,9 +75,9 @@ fun BookDetailsScreen(
                 verticalArrangement = Arrangement.Bottom
             ) {
                 Column {
-                    Text(text = "Book title", style = MaterialTheme.typography.titleLarge, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                    Text(text = viewModel.book.bookTitle, style = MaterialTheme.typography.titleLarge, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "Author name", style = MaterialTheme.typography.titleMedium)
+                    Text(text = viewModel.book.bookAuthor, style = MaterialTheme.typography.titleMedium)
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -81,7 +85,7 @@ fun BookDetailsScreen(
                 Button(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    onClick = {/*Add to favorites*/}
+                    onClick = { /*Add to favorites*/ }
                 ) {
                     Icon(Icons.Default.FavoriteBorder, contentDescription = "Add to favorites")
                     Spacer(modifier = Modifier.width(8.dp))
@@ -100,7 +104,7 @@ fun BookDetailsScreen(
         ) {
             LazyColumn(
                 modifier = Modifier
-                    .background(Color.LightGray, MaterialTheme.shapes.small)
+                    .background(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.shapes.small)
                     .weight(1f)
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
@@ -116,7 +120,7 @@ fun BookDetailsScreen(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text(text = "Title", style = MaterialTheme.typography.bodyMedium)
-                            Text(text = "Book title", style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                            Text(text = viewModel.book.bookTitle, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                         }
                     }
 
@@ -130,11 +134,11 @@ fun BookDetailsScreen(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text(text = "Author", style = MaterialTheme.typography.bodyMedium)
-                            Text(text = "Author name", style = MaterialTheme.typography.titleMedium)
+                            Text(text = viewModel.book.bookAuthor, style = MaterialTheme.typography.titleMedium)
                         }
                     }
 
-                    val genres = listOf("Genre 1", "Genre 2", "Genre 3", "Genre 4", "Genre 5", "Genre 6")
+
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -145,7 +149,7 @@ fun BookDetailsScreen(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text(text = "Genre", style = MaterialTheme.typography.bodyMedium)
-                            LazyRow { item{Text(text = genres.joinToString(" | "), style = MaterialTheme.typography.titleMedium) } }
+                            LazyRow { item{Text(text = genres.joinToString(" | "), style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis) } }
                         }
                     }
 
@@ -159,7 +163,7 @@ fun BookDetailsScreen(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text(text = "Location", style = MaterialTheme.typography.bodyMedium, softWrap = false)
-                            Text(text = "Location name", style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                            Text(text = viewModel.getBookLocationName(), style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                         }
                     }
 
@@ -199,7 +203,7 @@ fun BookDetailsScreen(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text(text = "Date added", style = MaterialTheme.typography.bodyMedium)
-                            Text(text = "01.01.2024", style = MaterialTheme.typography.titleMedium)
+                            Text(text = viewModel.book.bookAddedDate, style = MaterialTheme.typography.titleMedium)
                         }
                     }
 
@@ -222,7 +226,7 @@ fun BookDetailsScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             /*Bottom part of the screen*/
             Row(
@@ -233,11 +237,11 @@ fun BookDetailsScreen(
                 Button(
                     modifier = Modifier
                         .weight(1f),
-                    onClick = {/*Add a photo*/ }
+                    onClick = { /*Edit book*/ }
                 ) {
-                    Icon(painterResource(R.drawable.add_photo_icon), contentDescription = "Add photo")
+                    Icon(Icons.Default.Edit, contentDescription = "Edit book")
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = "Add photo", style = MaterialTheme.typography.labelMedium)
+                    Text(text = "Edit book", style = MaterialTheme.typography.labelMedium)
                 }
 
                 Spacer(modifier = Modifier.width(32.dp))
@@ -245,7 +249,7 @@ fun BookDetailsScreen(
                 Button(
                     modifier = Modifier
                         .weight(1f),
-                    onClick = {/*Delete book*/ }
+                    onClick = { /*Delete book*/ }
                 ) {
                     Icon(Icons.Default.Delete, contentDescription = "Delete book")
                     Spacer(modifier = Modifier.width(8.dp))
@@ -256,13 +260,3 @@ fun BookDetailsScreen(
     }
 }
 
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    BachelorV1Theme {
-        BookDetailsScreen()
-    }
-}

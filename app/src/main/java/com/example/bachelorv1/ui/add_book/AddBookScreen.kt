@@ -17,14 +17,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,17 +36,23 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.bachelorv1.R
 import com.example.bachelorv1.ui.theme.BachelorV1Theme
+import kotlinx.coroutines.flow.stateIn
 
 @Composable
 fun AddBookScreen(
-    //navController: NavController
+    navController: NavController,
+    viewModel: AddBookViewModel
 ) {
+    val genresNames = viewModel.getGenresNames()
+    val locationsNames = viewModel.getLocationsNames()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 32.dp)
+            .padding(top = 48.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
     ) {
         /*Top part of the screen*/
         Row(
@@ -98,8 +107,8 @@ fun AddBookScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(Color.LightGray, MaterialTheme.shapes.small),
-                        value = "Input",
-                        onValueChange = {},
+                        value = viewModel.bookTitle.value,
+                        onValueChange = { viewModel.bookTitle.value = it  },
                         label = { Text("Book title") }
                     )
                 }
@@ -114,8 +123,8 @@ fun AddBookScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(Color.LightGray, MaterialTheme.shapes.small),
-                        value = "Input",
-                        onValueChange = {},
+                        value = viewModel.authorName.value,
+                        onValueChange = { viewModel.authorName.value = it },
                         label = { Text("Author's name") }
                     )
                 }
@@ -130,26 +139,40 @@ fun AddBookScreen(
                         TextField(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(Color.LightGray, MaterialTheme.shapes.small)
-                                .clickable { /*Expanding menu*/ },
-                            value = "Input",
+                                .background(Color.LightGray, MaterialTheme.shapes.small),
+                            value = viewModel.selectedGenres.joinToString(" | "),
                             onValueChange = {},
                             label = { Text("Genres") },
                             readOnly = true,
-                            trailingIcon = { IconButton(onClick = { /*Expanding menu*/ }) { Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Genres list") } }
+                            trailingIcon = { IconButton(onClick = { viewModel.toggleGenreDropdown() }) { Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Genres list") } },
                         )
                         DropdownMenu(
-                            expanded = false,
-                            onDismissRequest = { /*Expanding menu*/ }
+                            expanded = viewModel.isGenreExpanded.value,
+                            onDismissRequest = { viewModel.toggleGenreDropdown() }
                         ) {
-                            DropdownMenuItem(
-                                text = { Text("Genre 1") },
-                                onClick = { /*Genre 1*/ }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Genreeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee 2") },
-                                onClick = { /*Genre 2*/ }
-                            )
+                            for (genreName in genresNames) {
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Text(genreName)
+                                            Checkbox(
+                                                checked = viewModel.selectedGenres.contains(
+                                                    genreName
+                                                ),
+                                                onCheckedChange = {
+                                                    viewModel.checkGenreCheckbox(
+                                                        genreName
+                                                    )
+                                                }
+                                            )
+                                        }
+                                    },
+                                    onClick = { viewModel.checkGenreCheckbox(genreName) }
+                                )
+                            }
                         }
                     }
                 }
@@ -164,26 +187,34 @@ fun AddBookScreen(
                         TextField(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(Color.LightGray, MaterialTheme.shapes.small)
-                                .clickable { /*Expanding menu*/ },
-                            value = "Input",
+                                .background(Color.LightGray, MaterialTheme.shapes.small),
+                            value = viewModel.selectedLocation.value,
                             onValueChange = {},
                             label = { Text("Location") },
                             readOnly = true,
-                            trailingIcon = { IconButton(onClick = { /*Expanding menu*/ }) { Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Locations list") } }
+                            trailingIcon = { IconButton(onClick = { viewModel.toggleLocationDropdown() }) { Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Locations list") } }
                         )
                         DropdownMenu(
-                            expanded = false,
-                            onDismissRequest = { /*Expanding menu*/ }
+                            expanded = viewModel.isLocationExpanded.value,
+                            onDismissRequest = { viewModel.toggleLocationDropdown() }
                         ) {
-                            DropdownMenuItem(
-                                text = { Text("Shelf 1") },
-                                onClick = { /*Shelf 1*/ }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Shelf 2") },
-                                onClick = { /*Shelf 2*/ }
-                            )
+                            for (locationName in locationsNames) {
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            RadioButton(
+                                                selected = viewModel.selectedLocation.value == locationName,
+                                                onClick = { viewModel.checkLocationRadio(locationName) }
+                                            )
+                                            Text(locationName)
+                                        }
+                                    },
+                                    onClick = { viewModel.checkLocationRadio(locationName) }
+                                )
+                            }
                         }
                     }
                 }
@@ -199,7 +230,9 @@ fun AddBookScreen(
                 Button(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    onClick = {/*Save book to your library*/ }
+                    onClick = { viewModel.saveBookToLibrary()
+                                navController.navigate("book_list")
+                    }
                 ) {
                     Icon(painterResource(R.drawable.save_icon), contentDescription = "Save book to your library")
                     Spacer(modifier = Modifier.width(8.dp))
@@ -210,11 +243,3 @@ fun AddBookScreen(
     }
 }
 
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    BachelorV1Theme {
-        AddBookScreen()
-    }
-}
