@@ -22,6 +22,21 @@ interface BookDao {
     @Query("UPDATE book SET bookIsRead = :isRead WHERE bookId = :bookId")
     fun updateBookReadStatus(bookId: Int, isRead: Boolean)
 
+    @Query("UPDATE book SET bookTitle = :newTitle WHERE bookId = :bookId")
+    fun updateBookTitle(bookId: Int, newTitle: String)
+
+    @Query("UPDATE book SET bookAuthor = :newAuthor WHERE bookId = :bookId")
+    fun updateBookAuthor(bookId: Int, newAuthor: String)
+
+    @Query("UPDATE book SET bookEdition = :newEdition WHERE bookId = :bookId")
+    fun updateBookEdition(bookId: Int, newEdition: String)
+
+    @Query("UPDATE book SET locationId = :newLocationId WHERE bookId = :bookId")
+    fun updateBookLocation(bookId: Int, newLocationId: Int)
+
+    @Query("DELETE FROM bookgenre WHERE bookId = :bookId")
+    fun deleteBookGenreCrossRef(bookId: Int)
+
     @Query("SELECT * FROM book ORDER BY bookTitle ASC")
     fun getAllBooksOrderedByTitle(): Flow<List<Book>>
 

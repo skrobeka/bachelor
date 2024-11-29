@@ -51,6 +51,7 @@ import com.example.bachelorv1.R
 @Composable
 fun BookDetailsScreenRoot(
     onBackClick: () -> Unit,
+    onEditClick: () -> Unit,
     bookId: Int
 ) {
     val viewModel: BookDetailsViewModel = viewModel(factory = object : ViewModelProvider.Factory {
@@ -59,9 +60,9 @@ fun BookDetailsScreenRoot(
             {
                 return BookDetailsViewModel(
                     bookId,
-                MainActivity.db.bookDao(),
-                MainActivity.db.locationDao(),
-                MainActivity.db.genreDao()
+                    MainActivity.db.bookDao(),
+                    MainActivity.db.locationDao(),
+                    MainActivity.db.genreDao()
                 ) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
@@ -75,6 +76,7 @@ fun BookDetailsScreenRoot(
         onAction = { action ->
             when (action) {
                 is BookDetailsAction.OnBackClick -> onBackClick()
+                is BookDetailsAction.OnEditClick -> onEditClick()
                 else -> Unit
             }
             viewModel.onAction(action)
@@ -266,7 +268,7 @@ fun BookDetailsScreen(
                         )
                     }
 
-                    if (state.book?.bookEdition != null) {
+                    if (state.book?.bookEdition != null && state.book.bookEdition != "") {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()

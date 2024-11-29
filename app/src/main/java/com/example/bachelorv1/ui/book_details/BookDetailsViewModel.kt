@@ -49,6 +49,9 @@ class BookDetailsViewModel(
                     bookDao.updateBookReadStatus(selectedBookId, !currentIsRead)
                 }
             }
+            is BookDetailsAction.OnEditClick -> {
+
+            }
             else -> Unit
         }
     }

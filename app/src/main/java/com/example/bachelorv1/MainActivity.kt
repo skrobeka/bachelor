@@ -21,6 +21,7 @@ import com.example.bachelorv1.ui.add_book.AddBookScreenRoot
 import com.example.bachelorv1.ui.book_details.BookDetailsScreenRoot
 import com.example.bachelorv1.ui.book_list.BookListScreenRoot
 import com.example.bachelorv1.ui.book_list.SelectedBookViewModel
+import com.example.bachelorv1.ui.edit_book.EditBookScreenRoot
 import com.example.bachelorv1.ui.favorite_book_list.FavoriteBookListScreenRoot
 import com.example.bachelorv1.ui.location_details.LocationDetailsScreenRoot
 import com.example.bachelorv1.ui.location_list.LocationListScreenRoot
@@ -47,7 +48,7 @@ class MainActivity : ComponentActivity() {
                         startDestination = Route.BookGraph
                     ) {
                         navigation<Route.BookGraph>(
-                            startDestination = Route.AddBook,
+                            startDestination = Route.BookList,
                         ) {
                             composable<Route.BookList> {
                                 val selectedBookViewModel = it.sharedViewModel<SelectedBookViewModel>(navController)
@@ -63,6 +64,9 @@ class MainActivity : ComponentActivity() {
                             composable<Route.BookDetails> {
                                 BookDetailsScreenRoot(
                                     onBackClick = { navController.popBackStack() },
+                                    onEditClick = {
+                                        navController.navigate(Route.EditBook(it.arguments?.getInt("bookId") ?: -1))
+                                    },
                                     bookId = it.arguments?.getInt("bookId") ?: -1
                                 )
                             }
@@ -106,7 +110,11 @@ class MainActivity : ComponentActivity() {
                             }
 
                             composable<Route.EditBook> {
-
+                                EditBookScreenRoot(
+                                    onBackClick = { navController.popBackStack() },
+                                    onBookSave = { navController.navigate(Route.BookDetails(it.arguments?.getInt("bookId") ?: -1)) {popUpTo(Route.BookDetails(it.arguments?.getInt("bookId") ?: -1)) {inclusive = true}} },
+                                    bookId = it.arguments?.getInt("bookId") ?: -1
+                                )
                             }
                         }
                     }
