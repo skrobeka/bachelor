@@ -1,4 +1,4 @@
-package com.example.bachelorv1.ui.book_list
+package com.example.bachelorv1.ui.location_details
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -43,18 +43,20 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bachelorv1.MainActivity
 import com.example.bachelorv1.R
 import com.example.bachelorv1.data.Book
+import com.example.bachelorv1.ui.book_list.BookListAction
 
 @Composable
-fun BookListScreenRoot(
-    onBookSelect: (Book) -> Unit
+fun LocationDetailsScreenRoot(
+    onBookSelect: (Book) -> Unit,
+    locationId: Int
 ) {
     val bookDao = MainActivity.db.bookDao()
-    val viewModel: BookListViewModel = viewModel(factory = object : ViewModelProvider.Factory {
+    val viewModel: LocationDetailsViewModel = viewModel(factory = object : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(BookListViewModel::class.java))
+            if (modelClass.isAssignableFrom(LocationDetailsViewModel::class.java))
             {
-                return BookListViewModel(bookDao)
-                as T
+                return LocationDetailsViewModel(locationId, bookDao)
+                        as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }
@@ -62,7 +64,7 @@ fun BookListScreenRoot(
 
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    BookListScreen(
+    LocationDetailsScreen(
         state = state,
         onAction = { action ->
             when (action) {
@@ -76,8 +78,8 @@ fun BookListScreenRoot(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookListScreen(
-    state: BookListState,
+fun LocationDetailsScreen(
+    state: LocationDetailsState,
     onAction: (BookListAction) -> Unit
 ) {
     val locationDao = MainActivity.db.locationDao()
@@ -103,7 +105,7 @@ fun BookListScreen(
                 query = state.searchQuery,
                 onQueryChange = { onAction(BookListAction.OnSearchQueryChange(it)) },
                 onSearch = { keyboardController?.hide() },
-                placeholder = { Text("Search for a book...") },
+                placeholder = { Text("Search for a book in this location...") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                 trailingIcon = {
                     if (state.searchQuery.isNotBlank()) {
@@ -118,12 +120,12 @@ fun BookListScreen(
         }
 
         LazyColumn {
-            val booksToDisplay = if (state.searchQuery.isBlank()) state.books else state.searchResults
+            val booksToDisplay = if (state.searchQuery.isBlank()) state.booksInLocation else state.searchResults
 
             if (state.searchQuery.length > 2 && state.searchResults.isEmpty()) {
                 item {
                     Text(
-                        text = "No books found",
+                        text = "No books found in this location",
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyLarge

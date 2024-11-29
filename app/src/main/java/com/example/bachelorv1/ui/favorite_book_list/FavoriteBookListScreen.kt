@@ -1,4 +1,4 @@
-package com.example.bachelorv1.ui.book_list
+package com.example.bachelorv1.ui.favorite_book_list
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +35,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -43,18 +44,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bachelorv1.MainActivity
 import com.example.bachelorv1.R
 import com.example.bachelorv1.data.Book
+import com.example.bachelorv1.ui.book_list.BookListAction
 
 @Composable
-fun BookListScreenRoot(
+fun FavoriteBookListScreenRoot(
     onBookSelect: (Book) -> Unit
 ) {
     val bookDao = MainActivity.db.bookDao()
-    val viewModel: BookListViewModel = viewModel(factory = object : ViewModelProvider.Factory {
+    val viewModel: FavoriteBookListViewModel = viewModel(factory = object : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(BookListViewModel::class.java))
+            if (modelClass.isAssignableFrom(FavoriteBookListViewModel::class.java))
             {
-                return BookListViewModel(bookDao)
-                as T
+                return FavoriteBookListViewModel(bookDao)
+                        as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }
@@ -62,7 +64,7 @@ fun BookListScreenRoot(
 
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    BookListScreen(
+    FavoriteBookListScreen(
         state = state,
         onAction = { action ->
             when (action) {
@@ -76,8 +78,8 @@ fun BookListScreenRoot(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookListScreen(
-    state: BookListState,
+fun FavoriteBookListScreen(
+    state: FavoriteBookListState,
     onAction: (BookListAction) -> Unit
 ) {
     val locationDao = MainActivity.db.locationDao()
@@ -118,12 +120,12 @@ fun BookListScreen(
         }
 
         LazyColumn {
-            val booksToDisplay = if (state.searchQuery.isBlank()) state.books else state.searchResults
+            val booksToDisplay = if (state.searchQuery.isBlank()) state.favoriteBooks else state.searchResults
 
             if (state.searchQuery.length > 2 && state.searchResults.isEmpty()) {
                 item {
                     Text(
-                        text = "No books found",
+                        text = "No favorite books found",
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyLarge
@@ -174,7 +176,7 @@ fun BookListScreen(
                                     text = book.bookTitle,
                                     style = MaterialTheme.typography.titleLarge,
                                     maxLines = 2,
-                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                    overflow = TextOverflow.Ellipsis
                                 )
                                 Text(
                                     text = book.bookAuthor,

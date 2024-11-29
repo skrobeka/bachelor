@@ -13,7 +13,7 @@ interface GenreDao {
 
     //Queries
     @Query("SELECT * FROM genre ORDER BY genreName ASC")
-    fun getAllGenresOrderedByName(): List<Genre>
+    fun getAllGenresOrderedByName(): Flow<List<Genre>>
 
     @Query("SELECT * FROM genre WHERE genreName = :genreName ORDER BY genreName ASC")
     fun getGenreByName(genreName: String): Genre

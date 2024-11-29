@@ -1,18 +1,23 @@
 package com.example.bachelorv1.ui.add_book
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.bachelorv1.data.Book
 import com.example.bachelorv1.data.BookDao
 import com.example.bachelorv1.data.BookGenreCrossRef
-import com.example.bachelorv1.data.Genre
 import com.example.bachelorv1.data.GenreDao
-import com.example.bachelorv1.data.Location
 import com.example.bachelorv1.data.LocationDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import java.time.LocalDate
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AddBookViewModel(
@@ -20,78 +25,68 @@ class AddBookViewModel(
     private val locationDao: LocationDao,
     private val genreDao: GenreDao
 ) : ViewModel() {
-    val bookTitle: MutableState<String> = mutableStateOf("")
-    val authorName: MutableState<String> = mutableStateOf("")
-
-    val genres: List<Genre> = genreDao.getAllGenresOrderedByName()
-    val selectedGenres: MutableList<String> = mutableStateListOf<String>()
-    val isGenreExpanded: MutableState<Boolean> = mutableStateOf(false)
-
-    val locations: List<Location> = locationDao.getAllLocationsOrderedByName()
-    val selectedLocation: MutableState<String> = mutableStateOf("")
-    val isLocationExpanded: MutableState<Boolean> = mutableStateOf(false)
-
-    fun toggleGenreDropdown() {
-        isGenreExpanded.value = !isGenreExpanded.value
-    }
-
-    fun toggleLocationDropdown() {
-        isLocationExpanded.value = !isLocationExpanded.value
-    }
-
-    fun checkGenreCheckbox(genreName: String) {
-        if (selectedGenres.contains(genreName) == false) {
-            selectedGenres.add(genreName)
+    private val _state = MutableStateFlow(AddBookState())
+    val state = _state
+        .onStart {
+            loadGenresAndLocations()
         }
-        else {
-            selectedGenres.remove(genreName)
-        }
-    }
-
-    fun checkLocationRadio(locationName: String) {
-        selectedLocation.value = locationName
-    }
-
-    fun getGenresNames(): List<String> {
-        return genres.map { it.genreName }
-    }
-
-    fun getLocationsNames(): List<String> {
-        return locations.map { it.locationName }
-    }
-
-    fun getAddedDate(): String {
-        val date = LocalDate.now()
-        return date.toString()
-    }
-
-    /*
-    fun addLocation(locationName: String) {
-        locationDao.insertLocation(Location(locationName = locationName))
-    }
-
-    fun addGenre(genreName: String) {
-        genreDao.insertGenre(Genre(genreName = genreName))
-    }
-     */
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            _state.value
+        )
 
 
-    fun saveBookToLibrary() {
-        val title = bookTitle.value
-        val author = authorName.value
-        val location = locationDao.getLocationIdByName(selectedLocation.value)
-
-        for (genre in selectedGenres) {
-            genreDao.getGenreIdByName(genre)
-        }
-
-        locationDao.updateLocation(Location(locationName = selectedLocation.value, locationBookCount = locationDao.getLocationBookCountById(location) + 1))
-        bookDao.insertBook(Book(bookTitle = title, bookAuthor = author, locationId = location, bookAddedDate = getAddedDate()))
-
-        val bookId = bookDao.getBookIdByTitleAuthorLocation(title, author, location)
-        for (genre in selectedGenres) {
-            bookDao.insertBookGenreCrossRef(BookGenreCrossRef(bookId, genreDao.getGenreIdByName(genre)))
+    fun onAction(action: AddBookAction) {
+        when (action) {
+            is AddBookAction.SetTitle -> _state.update { it.copy(title = action.title) }
+            is AddBookAction.SetAuthor -> _state.update { it.copy(author = action.author) }
+            is AddBookAction.SetGenre -> _state.update { it.copy(selectedGenres = action.genres) }
+            is AddBookAction.SetLocation -> _state.update { it.copy(selectedLocation = action.location) }
+            is AddBookAction.SetEdition -> _state.update { it.copy(edition = action.edition) }
+            is AddBookAction.SetIsGenreExpanded -> _state.update { it.copy(isGenreExpanded = action.isExpanded) }
+            is AddBookAction.SetIsLocationExpanded -> _state.update { it.copy(isLocationExpanded = action.isExpanded) }
+            is AddBookAction.SaveBook -> {
+                if (state.value.title.isBlank() || state.value.author.isBlank() || state.value.selectedLocation.isBlank() || state.value.selectedGenres.isEmpty()) {
+                    _state.update { it.copy(showError = true) }
+                } else {
+                    _state.update { it.copy(showError = false) }
+                    saveBook()
+                }
+            }
+            else -> Unit
         }
     }
 
+    private fun saveBook() {
+        viewModelScope.launch {
+            val book = Book(
+                bookTitle = state.value.title,
+                bookAuthor = state.value.author,
+                locationId = locationDao.getLocationIdByName(state.value.selectedLocation),
+                bookAddedDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+            )
+
+            bookDao.insertBook(Book(bookTitle = book.bookTitle, bookAuthor = book.bookAuthor, locationId = book.locationId, bookAddedDate = book.bookAddedDate, bookEdition = state.value.edition))
+
+            val bookId = bookDao.getBookIdByTitleAuthorLocation(book.bookTitle, book.bookAuthor, book.locationId)
+
+            val bookGenres = state.value.selectedGenres.map { genreName -> BookGenreCrossRef(bookId, genreDao.getGenreIdByName(genreName)) }
+
+            bookDao.insertBookGenreCrossRef(bookGenres)
+        }
+    }
+
+    private fun loadGenresAndLocations() {
+        viewModelScope.launch {
+            val genres = genreDao.getAllGenresOrderedByName().first()
+            val locations = locationDao.getAllLocationsOrderedByName().first()
+            _state.update {
+                it.copy(
+                    genres = genres,
+                    locations = locations
+                )
+            }
+        }
+    }
 }

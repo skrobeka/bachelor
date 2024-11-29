@@ -1,9 +1,11 @@
-package com.example.bachelorv1.ui.location_list
+package com.example.bachelorv1.ui.favorite_book_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bachelorv1.data.Location
-import com.example.bachelorv1.data.LocationDao
+import com.example.bachelorv1.data.Book
+import com.example.bachelorv1.data.BookDao
+import com.example.bachelorv1.ui.book_list.BookListAction
+import com.example.bachelorv1.ui.book_list.BookListState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,20 +18,21 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class LocationListViewModel(
-    private val locationDao: LocationDao
+class FavoriteBookListViewModel(
+    private val bookDao: BookDao
 ) : ViewModel() {
-    private var locations = emptyList<Location>()
-    private var searchJob: Job? = null
-    private var observeAllJob: Job? = null
+    private var favoriteBooks = emptyList<Book>()
 
-    private val _state = MutableStateFlow(LocationListState())
+    private var searchFavoriteJob: Job? = null
+    private var observeFavoriteJob: Job? = null
+
+    private val _state = MutableStateFlow(FavoriteBookListState())
     val state = _state
         .onStart {
-            if (locations.isEmpty()) {
-                observeSearchLocations()
+            if (favoriteBooks.isEmpty()) {
+                observeSearchBooks()
             }
-            observeAllLocations()
+            observeFavoriteBooks()
         }
         .stateIn(
             viewModelScope,
@@ -37,15 +40,15 @@ class LocationListViewModel(
             _state.value
         )
 
-    fun onAction(action: LocationListAction) {
+    fun onAction(action: BookListAction) {
         when (action) {
-            is LocationListAction.OnLocationSelect -> {
+            is BookListAction.OnBookSelect -> {
                 _state.update {
-                    it.copy(selectedLocationId = action.location.locationId)
+                    it.copy(selectedBookId = action.book.bookId)
                 }
             }
 
-            is LocationListAction.OnSearchQueryChange -> {
+            is BookListAction.OnSearchQueryChange -> {
                 _state.update {
                     it.copy(searchQuery = action.searchedQuery)
                 }
@@ -53,19 +56,18 @@ class LocationListViewModel(
         }
     }
 
-    private fun observeAllLocations() {
-        observeAllJob?.cancel()
-        observeAllJob = locationDao
-            .getAllLocationsOrderedByName()
-            .onEach { locations ->
+    private fun observeFavoriteBooks() {
+        observeFavoriteJob?.cancel()
+        observeFavoriteJob = bookDao.getFavoriteBooks()
+            .onEach { books ->
                 _state.update { it.copy(
-                        locations = locations
+                    favoriteBooks = books
                 ) }
             }
             .launchIn(viewModelScope)
     }
 
-    private fun observeSearchLocations() {
+    private fun observeSearchBooks() {
         state.map { it.searchQuery }
             .distinctUntilChanged()
             .onEach { query ->
@@ -73,27 +75,28 @@ class LocationListViewModel(
                     query.isBlank() -> {
                         _state.update {
                             it.copy(
-                                searchResults = locations
+                                searchResults = favoriteBooks
                             )
                         }
                     }
 
                     query.length >= 3 -> {
-                        searchJob?.cancel()
-                        searchJob = searchLocations(query)
+                        searchFavoriteJob?.cancel()
+                        searchFavoriteJob = searchFavoriteBooks(query)
                     }
                 }
             }
             .launchIn(viewModelScope)
     }
 
-    private fun searchLocations(query: String) = viewModelScope.launch {
+
+    private fun searchFavoriteBooks(query: String) = viewModelScope.launch {
         _state.update {
             it.copy(
                 isLoading = true
             )
         }
-        val searchResults = locationDao.getLocationByName(query)
+        val searchResults = bookDao.getFavoriteBookByTitle(query)
         _state.update {
             it.copy(
                 searchResults = searchResults,

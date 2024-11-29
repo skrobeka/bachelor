@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
@@ -27,34 +28,65 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.bachelorv1.MainActivity
 import com.example.bachelorv1.R
-import com.example.bachelorv1.ui.theme.BachelorV1Theme
-import kotlinx.coroutines.flow.stateIn
+
+@Composable
+fun AddBookScreenRoot(
+    onBackClick: () -> Unit,
+    onBookSave: () -> Unit
+) {
+    val viewModel: AddBookViewModel = viewModel(factory = object : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(AddBookViewModel::class.java))
+            {
+                return AddBookViewModel(
+                    MainActivity.db.bookDao(),
+                    MainActivity.db.locationDao(),
+                    MainActivity.db.genreDao()
+                ) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
+    })
+
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    AddBookScreen(
+        state = state,
+        onAction = { action ->
+            when (action) {
+                is AddBookAction.OnBackClick -> onBackClick()
+                is AddBookAction.OnBookSave -> onBookSave()
+                else -> Unit
+            }
+            viewModel.onAction(action)
+        }
+    )
+}
 
 @Composable
 fun AddBookScreen(
-    navController: NavController,
-    viewModel: AddBookViewModel
+    state: AddBookState,
+    onAction: (AddBookAction) -> Unit
 ) {
-    val genresNames = viewModel.getGenresNames()
-    val locationsNames = viewModel.getLocationsNames()
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(top = 48.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
     ) {
-        /*Top part of the screen*/
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -107,8 +139,8 @@ fun AddBookScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(Color.LightGray, MaterialTheme.shapes.small),
-                        value = viewModel.bookTitle.value,
-                        onValueChange = { viewModel.bookTitle.value = it  },
+                        value = state.title,
+                        onValueChange = { onAction(AddBookAction.SetTitle(it)) },
                         label = { Text("Book title") }
                     )
                 }
@@ -123,8 +155,8 @@ fun AddBookScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(Color.LightGray, MaterialTheme.shapes.small),
-                        value = viewModel.authorName.value,
-                        onValueChange = { viewModel.authorName.value = it },
+                        value = state.author,
+                        onValueChange = { onAction(AddBookAction.SetAuthor(it)) },
                         label = { Text("Author's name") }
                     )
                 }
@@ -140,37 +172,47 @@ fun AddBookScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(Color.LightGray, MaterialTheme.shapes.small),
-                            value = viewModel.selectedGenres.joinToString(" | "),
+                            value = state.selectedGenres.joinToString(" | "),
                             onValueChange = {},
                             label = { Text("Genres") },
                             readOnly = true,
-                            trailingIcon = { IconButton(onClick = { viewModel.toggleGenreDropdown() }) { Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Genres list") } },
+                            trailingIcon = {
+                                if (state.isGenreExpanded == false) {
+                                    IconButton(onClick = { onAction(AddBookAction.SetIsGenreExpanded(true)) }) { Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Genres list") }
+                                }
+                                else {
+                                    IconButton(onClick = { onAction(AddBookAction.SetIsGenreExpanded(false)) }) { Icon(Icons.Filled.KeyboardArrowUp, contentDescription = "Genres list") }
+                                }
+                            },
+                            placeholder = { Text("Select at least one genre") }
                         )
                         DropdownMenu(
-                            expanded = viewModel.isGenreExpanded.value,
-                            onDismissRequest = { viewModel.toggleGenreDropdown() }
+                            expanded = state.isGenreExpanded,
+                            onDismissRequest = { onAction(AddBookAction.SetIsGenreExpanded(false)) }
                         ) {
-                            for (genreName in genresNames) {
+                            state.genres.forEach { genre ->
+                                val updatedGenres = state.selectedGenres.toMutableList()
                                 DropdownMenuItem(
                                     text = {
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically,
                                             horizontalArrangement = Arrangement.SpaceBetween
                                         ) {
-                                            Text(genreName)
+                                            Text(genre.genreName)
                                             Checkbox(
-                                                checked = viewModel.selectedGenres.contains(
-                                                    genreName
-                                                ),
-                                                onCheckedChange = {
-                                                    viewModel.checkGenreCheckbox(
-                                                        genreName
-                                                    )
+                                                checked = state.selectedGenres.contains(genre.genreName),
+                                                onCheckedChange = { isChecked ->
+                                                    if (isChecked) {
+                                                        updatedGenres.add(genre.genreName)
+                                                    } else {
+                                                        updatedGenres.remove(genre.genreName)
+                                                    }
+                                                    onAction(AddBookAction.SetGenre(updatedGenres))
                                                 }
                                             )
                                         }
                                     },
-                                    onClick = { viewModel.checkGenreCheckbox(genreName) }
+                                    onClick = { onAction(AddBookAction.SetGenre(updatedGenres)) }
                                 )
                             }
                         }
@@ -188,17 +230,25 @@ fun AddBookScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(Color.LightGray, MaterialTheme.shapes.small),
-                            value = viewModel.selectedLocation.value,
+                            value = state.selectedLocation,
                             onValueChange = {},
                             label = { Text("Location") },
                             readOnly = true,
-                            trailingIcon = { IconButton(onClick = { viewModel.toggleLocationDropdown() }) { Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Locations list") } }
+                            trailingIcon = {
+                                if (state.isLocationExpanded == false) {
+                                    IconButton(onClick = { onAction(AddBookAction.SetIsLocationExpanded(true)) }) { Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Locations list") }
+                                }
+                                else {
+                                    IconButton(onClick = { onAction(AddBookAction.SetIsLocationExpanded(false)) }) { Icon(Icons.Filled.KeyboardArrowUp, contentDescription = "Locations list") }
+                                }
+                            },
+                            placeholder = { Text("Select location") },
                         )
                         DropdownMenu(
-                            expanded = viewModel.isLocationExpanded.value,
-                            onDismissRequest = { viewModel.toggleLocationDropdown() }
+                            expanded = state.isLocationExpanded,
+                            onDismissRequest = { onAction(AddBookAction.SetIsLocationExpanded(false)) }
                         ) {
-                            for (locationName in locationsNames) {
+                            state.locations.forEach { location ->
                                 DropdownMenuItem(
                                     text = {
                                         Row(
@@ -206,20 +256,45 @@ fun AddBookScreen(
                                             horizontalArrangement = Arrangement.SpaceBetween
                                         ) {
                                             RadioButton(
-                                                selected = viewModel.selectedLocation.value == locationName,
-                                                onClick = { viewModel.checkLocationRadio(locationName) }
+                                                selected = state.selectedLocation == location.locationName,
+                                                onClick = { onAction(AddBookAction.SetLocation(location.locationName)) }
                                             )
-                                            Text(locationName)
+                                            Text(location.locationName)
                                         }
                                     },
-                                    onClick = { viewModel.checkLocationRadio(locationName) }
+                                    onClick = { onAction(AddBookAction.SetLocation(location.locationName)) }
                                 )
                             }
                         }
                     }
                 }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.LightGray, MaterialTheme.shapes.small),
+                        value = state.edition ?: "",
+                        onValueChange = { onAction(AddBookAction.SetEdition(it)) },
+                        label = { Text("Book's edition") },
+                        placeholder = { Text("Optional") }
+                    )
+                }
             }
-            
+
+            if (state.showError) {
+                Text(
+                    text = "Please fill in all mandatory fields",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(
@@ -230,8 +305,11 @@ fun AddBookScreen(
                 Button(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    onClick = { viewModel.saveBookToLibrary()
-                                navController.navigate("book_list")
+                    onClick = {
+                        onAction(AddBookAction.SaveBook)
+                        if (state.title.isNotBlank() && state.author.isNotBlank() && state.selectedLocation.isNotBlank() && state.selectedGenres.isNotEmpty()) {
+                            onAction(AddBookAction.OnBookSave)
+                        }
                     }
                 ) {
                     Icon(painterResource(R.drawable.save_icon), contentDescription = "Save book to your library")

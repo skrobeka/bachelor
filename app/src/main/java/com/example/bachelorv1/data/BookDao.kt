@@ -10,14 +10,20 @@ interface BookDao {
     fun insertBook(book: Book)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    fun insertBookGenreCrossRef(crossRef: BookGenreCrossRef)
+    fun insertBookGenreCrossRef(bookGenres: List<BookGenreCrossRef>)
 
     @Delete
     fun deleteBook(book: Book)
 
     //Queries
+    @Query("UPDATE book SET bookIsFavorite = :isFavorite WHERE bookId = :bookId")
+    fun updateBookFavoriteStatus(bookId: Int, isFavorite: Boolean)
+
+    @Query("UPDATE book SET bookIsRead = :isRead WHERE bookId = :bookId")
+    fun updateBookReadStatus(bookId: Int, isRead: Boolean)
+
     @Query("SELECT * FROM book ORDER BY bookTitle ASC")
-    fun getAllBooksOrderedByTitle(): List<Book>
+    fun getAllBooksOrderedByTitle(): Flow<List<Book>>
 
     @Query("SELECT * FROM book ORDER BY bookAddedDate ASC")
     fun getAllBooksOrderedByAddedDate(): Flow<List<Book>>
@@ -27,6 +33,12 @@ interface BookDao {
 
     @Query("SELECT * FROM book WHERE bookTitle LIKE '%' || :bookTitle || '%' ORDER BY bookTitle ASC")
     fun getBookByTitle(bookTitle: String): List<Book>
+
+    @Query("SELECT * FROM book WHERE bookTitle LIKE '%' || :bookTitle || '%' AND bookIsFavorite = 1 ORDER BY bookTitle ASC")
+    fun getFavoriteBookByTitle(bookTitle: String): List<Book>
+
+    @Query("SELECT * FROM book WHERE bookTitle LIKE '%' || :bookTitle || '%' AND locationId = :locationId ORDER BY bookTitle ASC")
+    fun getLocationBookByTitle(locationId: Int, bookTitle: String): List<Book>
 
     @Query("SELECT * FROM book WHERE bookAuthor = :bookAuthor ORDER BY bookAuthor ASC")
     fun getBookByAuthor(bookAuthor: String): Book
@@ -39,6 +51,15 @@ interface BookDao {
 
     @Query("SELECT * FROM book WHERE bookId = :bookId")
     fun getBookById(bookId: Int): Book
+
+    @Query("SELECT bookIsFavorite FROM book WHERE bookId = :bookId")
+    fun isBookFavorite(bookId: Int): Flow<Boolean>
+
+    @Query("SELECT bookIsRead FROM book WHERE bookId = :bookId")
+    fun isBookRead(bookId: Int): Flow<Boolean>
+
+    @Query("SELECT * FROM book WHERE bookIsFavorite = 1 ORDER BY bookTitle ASC")
+    fun getFavoriteBooks(): Flow<List<Book>>
 
     @Transaction
     @Query("SELECT genreId FROM bookgenre WHERE bookId = :bookId")
