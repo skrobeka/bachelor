@@ -67,6 +67,9 @@ interface BookDao {
     @Query("SELECT * FROM book WHERE bookId = :bookId")
     fun getBookById(bookId: Int): Book
 
+    @Query("SELECT bookTitle FROM book WHERE bookId = :bookId")
+    fun getBookTitleById(bookId: Int): String
+
     @Query("SELECT bookIsFavorite FROM book WHERE bookId = :bookId")
     fun isBookFavorite(bookId: Int): Flow<Boolean>
 

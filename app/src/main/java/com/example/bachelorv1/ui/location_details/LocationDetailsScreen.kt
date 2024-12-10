@@ -133,6 +133,17 @@ fun LocationDetailsScreen(
                 }
             }
 
+            if (booksToDisplay.isEmpty() && state.searchQuery.isBlank()) {
+                item {
+                    Text(
+                        text = "No books found in this location",
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+
             for (book in booksToDisplay) {
                 item {
                     Card(

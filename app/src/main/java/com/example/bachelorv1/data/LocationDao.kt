@@ -30,11 +30,11 @@ interface LocationDao {
     @Query("SELECT locationId FROM location WHERE locationName = :locationName LIMIT 1")
     fun getLocationIdByName(locationName: String): Int
 
+    @Query("SELECT * FROM location WHERE locationId = :locationId")
+    fun getLocationById(locationId: Int): Location
+
     @Query("SELECT locationName FROM location WHERE locationId = :locationId")
     fun getLocationNameById(locationId: Int): String
-
-    @Query("SELECT locationBookCount FROM location WHERE locationId = :locationId LIMIT 1")
-    fun getLocationBookCountById(locationId: Int): Int
 
     @Query("SELECT COUNT (*) FROM book WHERE locationId = :locationId")
     fun getLocationBookCount(locationId: Int): Int

@@ -7,10 +7,10 @@
       </SelectionState>
       <SelectionState runConfigName="MainActivity">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-11-28T11:44:57.474507200Z">
+        <DropdownSelection timestamp="2024-12-08T00:27:01.988515Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\antek\.android\avd\Pixel_8_API_31_1.avd" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=24161FDEE001YU" />
             </handle>
           </Target>
         </DropdownSelection>

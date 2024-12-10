@@ -123,6 +123,17 @@ fun LocationListScreen(
                 }
             }
 
+            if (locationsToDisplay.isEmpty()) {
+                item {
+                    Text(
+                        text = "No locations found",
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+
             for (location in locationsToDisplay) {
                 item {
                     Card(

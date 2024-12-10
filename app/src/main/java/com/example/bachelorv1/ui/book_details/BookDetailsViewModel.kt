@@ -49,8 +49,8 @@ class BookDetailsViewModel(
                     bookDao.updateBookReadStatus(selectedBookId, !currentIsRead)
                 }
             }
-            is BookDetailsAction.OnEditClick -> {
-
+            is BookDetailsAction.OnDeleteClick -> {
+                deleteBook()
             }
             else -> Unit
         }
@@ -69,6 +69,13 @@ class BookDetailsViewModel(
                     isLoading = false
                 )
             }
+        }
+    }
+
+    private fun deleteBook() {
+        viewModelScope.launch {
+            bookDao.deleteBook(bookDao.getBookById(bookId))
+            bookDao.deleteBookGenreCrossRef(bookId)
         }
     }
 

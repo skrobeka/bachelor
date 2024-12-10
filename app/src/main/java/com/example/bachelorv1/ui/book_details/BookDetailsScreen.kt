@@ -52,6 +52,7 @@ import com.example.bachelorv1.R
 fun BookDetailsScreenRoot(
     onBackClick: () -> Unit,
     onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit,
     bookId: Int
 ) {
     val viewModel: BookDetailsViewModel = viewModel(factory = object : ViewModelProvider.Factory {
@@ -77,6 +78,7 @@ fun BookDetailsScreenRoot(
             when (action) {
                 is BookDetailsAction.OnBackClick -> onBackClick()
                 is BookDetailsAction.OnEditClick -> onEditClick()
+                is BookDetailsAction.OnDeleteClick -> onDeleteClick()
                 else -> Unit
             }
             viewModel.onAction(action)
@@ -92,7 +94,7 @@ fun BookDetailsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 48.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
+            .padding(16.dp)
     ) {
         Row(
             modifier = Modifier

@@ -1,6 +1,5 @@
 package com.example.bachelorv1.ui.edit_book
 
-
 sealed interface EditBookAction {
     object OnBackClick : EditBookAction
     object OnBookSave : EditBookAction

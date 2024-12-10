@@ -105,7 +105,7 @@ fun FavoriteBookListScreen(
                 query = state.searchQuery,
                 onQueryChange = { onAction(BookListAction.OnSearchQueryChange(it)) },
                 onSearch = { keyboardController?.hide() },
-                placeholder = { Text("Search for a book...") },
+                placeholder = { Text("Search for a favorite book...") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                 trailingIcon = {
                     if (state.searchQuery.isNotBlank()) {
@@ -123,6 +123,17 @@ fun FavoriteBookListScreen(
             val booksToDisplay = if (state.searchQuery.isBlank()) state.favoriteBooks else state.searchResults
 
             if (state.searchQuery.length > 2 && state.searchResults.isEmpty()) {
+                item {
+                    Text(
+                        text = "No favorite books found",
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+
+            if (booksToDisplay.isEmpty() && state.searchQuery.isBlank()) {
                 item {
                     Text(
                         text = "No favorite books found",
