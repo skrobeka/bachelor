@@ -25,7 +25,10 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.List
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -45,6 +48,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.bachelorv1.MainActivity
 import com.example.bachelorv1.R
 
@@ -102,14 +106,27 @@ fun BookDetailsScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box {
-                Image(
-                    modifier = Modifier
-                        .size(width = 144.dp, height = 192.dp)
-                        .clip(MaterialTheme.shapes.small),
-                    contentScale = ContentScale.FillHeight,
-                    painter = painterResource(R.drawable.test_pic),
-                    contentDescription = null
-                )
+                if (state.book?.bookPhoto == null || state.book.bookPhoto == "") {
+                    Image(
+                        modifier = Modifier
+                            .size(width = 144.dp, height = 192.dp)
+                            .clip(MaterialTheme.shapes.small),
+                        contentScale = ContentScale.FillHeight,
+                        painter = painterResource(R.drawable.test_pic),
+                        contentDescription = "Default book photo"
+                    )
+                }
+                else {
+                    val bookUri = Uri.parse(state.book.bookPhoto)
+                    AsyncImage(
+                        model = bookUri,
+                        modifier = Modifier
+                            .size(width = 144.dp, height = 192.dp)
+                            .clip(MaterialTheme.shapes.small),
+                        contentScale = ContentScale.FillWidth,
+                        contentDescription = "Book photo"
+                    )
+                }
                 if (state.isFavorite) {
                     Icon(
                         imageVector = Icons.Filled.Favorite,
@@ -119,6 +136,17 @@ fun BookDetailsScreen(
                             .padding(8.dp)
                             .size(32.dp),
                         tint = Color.Red
+                    )
+                }
+                if (state.isOnReadingList) {
+                    Icon(
+                        imageVector = Icons.Outlined.List,
+                        contentDescription = "Reading List",
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .padding(8.dp)
+                            .size(32.dp),
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -132,12 +160,37 @@ fun BookDetailsScreen(
                 verticalArrangement = Arrangement.Bottom
             ) {
                 Column {
-                    Text(text = state.book?.bookTitle.toString(), style = MaterialTheme.typography.titleLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    Text(text = state.book?.bookTitle.toString(), style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = state.book?.bookAuthor.toString(), style = MaterialTheme.typography.titleMedium)
+                    Text(text = state.book?.bookAuthor.toString(), style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if(state.isOnReadingList) {
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        onClick = { onAction(BookDetailsAction.OnReadingListClick) }
+                    ) {
+                        Icon(painterResource(R.drawable.playlist_remove_icon), contentDescription = "Remove from reading list")
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = "Remove from reading list", style = MaterialTheme.typography.labelMedium)
+                    }
+                }
+                else {
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        onClick = { onAction(BookDetailsAction.OnReadingListClick) }
+                    ) {
+                        Icon(painterResource(R.drawable.playlist_add_icon), contentDescription = "Add to reading list")
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = "Add to reading list", style = MaterialTheme.typography.labelMedium)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 if(state.isFavorite) {
                     Button(
@@ -206,22 +259,7 @@ fun BookDetailsScreen(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text(text = "Author", style = MaterialTheme.typography.bodyMedium)
-                            Text(text = state.book?.bookAuthor.toString(), style = MaterialTheme.typography.titleMedium)
-                        }
-                    }
-
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(painterResource(R.drawable.genres_icon), contentDescription = "Author icon", tint = MaterialTheme.colorScheme.onSecondaryContainer)
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column {
-                            Text(text = "Genre", color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.bodyMedium)
-                            LazyRow { item{Text(text = state.bookGenres.joinToString(" | "), color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis) } }
+                            Text(text = state.book?.bookAuthor.toString(), style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         }
                     }
 
@@ -236,6 +274,23 @@ fun BookDetailsScreen(
                         Column {
                             Text(text = "Location", color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.bodyMedium, softWrap = false)
                             Text(text = state.bookLocation, color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                    }
+
+                    if (state.bookGenres.isNotEmpty()) {
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(painterResource(R.drawable.genres_icon), contentDescription = "Genres icon", tint = MaterialTheme.colorScheme.onSecondaryContainer)
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Column {
+                                Text(text = "Genre", color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.bodyMedium)
+                                LazyRow { item{Text(text = state.bookGenres.joinToString(" | "), color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis) } }
+                            }
                         }
                     }
 
@@ -270,18 +325,34 @@ fun BookDetailsScreen(
                         )
                     }
 
-                    if (state.book?.bookEdition != null && state.book.bookEdition != "") {
+                    if (state.book?.bookNote != null && state.book.bookNote != "") {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp, vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(painterResource(R.drawable.edition_icon), contentDescription = "Edition icon", tint = MaterialTheme.colorScheme.onSecondaryContainer)
+                            Icon(painterResource(R.drawable.note_icon), contentDescription = "Note icon", tint = MaterialTheme.colorScheme.onSecondaryContainer)
                             Spacer(modifier = Modifier.width(16.dp))
                             Column {
-                                Text(text = "Book edition", color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.bodyMedium)
-                                Text(text = state.book.bookEdition, color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.titleMedium)
+                                Text(text = "Note on book", color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.bodyMedium)
+                                Text(text = state.book.bookNote, color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.titleMedium)
+                            }
+                        }
+                    }
+
+                    if (state.book?.bookCost != null && state.book.bookCost != "") {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(painterResource(R.drawable.cost_icon), contentDescription = "Cost icon", tint = MaterialTheme.colorScheme.onSecondaryContainer)
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Column {
+                                Text(text = "Book's cost", color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.bodyMedium)
+                                Text(text = state.book.bookCost, color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.titleMedium)
                             }
                         }
                     }
@@ -326,6 +397,31 @@ fun BookDetailsScreen(
                             }
                         }
                     }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(modifier = Modifier.size(24.dp), painter = painterResource(R.drawable.goodreads_icon), contentDescription = "Goodreads icon")
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column {
+                            Text(text = "Search in goodreads", color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.bodyMedium)
+                            val bookLink = state.book?.bookTitle?.replace(" ", "+") + "+" + state.book?.bookAuthor?.replace(" ", "+")
+                            Row(modifier = Modifier.clickable {
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.goodreads.com/search?q=$bookLink"))
+                                launcher.launch(intent)
+                            }) {
+                                Text(text = "https://www.goodreads.com/search?q=$bookLink",
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+                    }
                 }
             }
 
@@ -346,7 +442,7 @@ fun BookDetailsScreen(
                     Text(text = "Edit book", style = MaterialTheme.typography.labelMedium)
                 }
 
-                Spacer(modifier = Modifier.width(32.dp))
+                Spacer(modifier = Modifier.width(16.dp))
 
                 Button(
                     modifier = Modifier

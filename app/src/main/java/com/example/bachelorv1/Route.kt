@@ -12,7 +12,7 @@ sealed interface Route {
     data object BookList : Route
 
     @Serializable
-    data class BookDetails(val bookId: Int, val bookTitle: String = "") : Route
+    data class BookDetails(val bookId: Int) : Route
 
     @Serializable
     data object LocationList : Route
@@ -22,6 +22,9 @@ sealed interface Route {
 
     @Serializable
     data object FavoriteList : Route
+
+    @Serializable
+    data object ReadingList : Route
 
     @Serializable
     data object AddBook : Route

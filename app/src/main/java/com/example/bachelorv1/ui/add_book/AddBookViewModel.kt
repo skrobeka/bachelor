@@ -39,15 +39,17 @@ class AddBookViewModel(
 
     fun onAction(action: AddBookAction) {
         when (action) {
+            is AddBookAction.SetPhoto -> _state.update { it.copy(photo = action.photo) }
             is AddBookAction.SetTitle -> _state.update { it.copy(title = action.title) }
             is AddBookAction.SetAuthor -> _state.update { it.copy(author = action.author) }
             is AddBookAction.SetGenre -> _state.update { it.copy(selectedGenres = action.genres) }
             is AddBookAction.SetLocation -> _state.update { it.copy(selectedLocation = action.location) }
-            is AddBookAction.SetEdition -> _state.update { it.copy(edition = action.edition) }
+            is AddBookAction.SetNote -> _state.update { it.copy(note = action.note) }
             is AddBookAction.SetIsGenreExpanded -> _state.update { it.copy(isGenreExpanded = action.isExpanded) }
             is AddBookAction.SetIsLocationExpanded -> _state.update { it.copy(isLocationExpanded = action.isExpanded) }
+            is AddBookAction.SetCost -> _state.update { it.copy(cost = action.cost) }
             is AddBookAction.SaveBook -> {
-                if (state.value.title.isBlank() || state.value.author.isBlank() || state.value.selectedLocation.isBlank() || state.value.selectedGenres.isEmpty()) {
+                if (state.value.title.isBlank() || state.value.author.isBlank() || state.value.selectedLocation.isBlank()) {
                     _state.update { it.copy(showError = true) }
                 } else {
                     _state.update { it.copy(showError = false) }
@@ -61,19 +63,22 @@ class AddBookViewModel(
     private fun saveBook() {
         viewModelScope.launch {
             val book = Book(
+                bookPhoto = state.value.photo,
                 bookTitle = state.value.title,
                 bookAuthor = state.value.author,
                 locationId = locationDao.getLocationIdByName(state.value.selectedLocation),
                 bookAddedDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
             )
 
-            bookDao.insertBook(Book(bookTitle = book.bookTitle, bookAuthor = book.bookAuthor, locationId = book.locationId, bookAddedDate = book.bookAddedDate, bookEdition = state.value.edition))
+            bookDao.insertBook(Book(bookPhoto = book.bookPhoto, bookTitle = book.bookTitle, bookAuthor = book.bookAuthor, locationId = book.locationId, bookAddedDate = book.bookAddedDate, bookNote = state.value.note, bookCost = state.value.cost))
 
             val bookId = bookDao.getBookIdByTitleAuthorLocation(book.bookTitle, book.bookAuthor, book.locationId)
 
-            val bookGenres = state.value.selectedGenres.map { genreName -> BookGenreCrossRef(bookId, genreDao.getGenreIdByName(genreName)) }
+            if (state.value.selectedGenres.isNotEmpty()) {
+                val bookGenres = state.value.selectedGenres.map { genreName -> BookGenreCrossRef(bookId, genreDao.getGenreIdByName(genreName)) }
 
-            bookDao.insertBookGenreCrossRef(bookGenres)
+                bookDao.insertBookGenreCrossRef(bookGenres)
+            }
         }
     }
 

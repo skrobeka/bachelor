@@ -28,6 +28,7 @@ class BookDetailsViewModel(
             loadBook()
             observeFavoriteStatus()
             observeIsReadStatus()
+            observeReadingListStatus()
         }
         .stateIn(
             viewModelScope,
@@ -47,6 +48,12 @@ class BookDetailsViewModel(
                 viewModelScope.launch {
                     val currentIsRead = state.value.isRead
                     bookDao.updateBookReadStatus(selectedBookId, !currentIsRead)
+                }
+            }
+            is BookDetailsAction.OnReadingListClick -> {
+                viewModelScope.launch {
+                    val currentIsOnReadingList = state.value.isOnReadingList
+                    bookDao.updateBookReadingListStatus(selectedBookId, !currentIsOnReadingList)
                 }
             }
             is BookDetailsAction.OnDeleteClick -> {
@@ -85,6 +92,18 @@ class BookDetailsViewModel(
                 _state.update {
                     it.copy(
                         isFavorite = isFavorite
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun observeReadingListStatus() {
+        bookDao.isBookOnReadingList(bookId)
+            .onEach { isOnReadingList ->
+                _state.update {
+                    it.copy(
+                        isOnReadingList = isOnReadingList
                     )
                 }
             }

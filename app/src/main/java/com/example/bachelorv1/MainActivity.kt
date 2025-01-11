@@ -13,12 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.ExtendedFloatingActionButton
-import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -60,6 +60,7 @@ import com.example.bachelorv1.ui.favorite_book_list.FavoriteBookListScreenRoot
 import com.example.bachelorv1.ui.location_details.LocationDetailsScreenRoot
 import com.example.bachelorv1.ui.location_list.LocationListScreenRoot
 import com.example.bachelorv1.ui.location_list.SelectedLocationViewModel
+import com.example.bachelorv1.ui.reading_list.ReadingListScreenRoot
 import com.example.bachelorv1.ui.theme.BachelorV1Theme
 
 
@@ -170,12 +171,14 @@ class MainActivity : ComponentActivity() {
                                             listOf(
                                                 Route.BookList,
                                                 Route.LocationList,
-                                                Route.FavoriteList
+                                                Route.FavoriteList,
+                                                Route.ReadingList
                                             ).forEach { route ->
                                                 val title = when (route) {
                                                     Route.BookList -> "Books"
                                                     Route.LocationList -> "Locations"
                                                     Route.FavoriteList -> "Favorites"
+                                                    Route.ReadingList -> "Reading list"
                                                     else -> ""
                                                 }
                                                 NavigationBarItem(
@@ -190,6 +193,7 @@ class MainActivity : ComponentActivity() {
                                                             Route.BookList -> Icon(painterResource(R.drawable.book_icon), contentDescription = "Books icon")
                                                             Route.LocationList -> Icon(painterResource(R.drawable.shelves_icon), contentDescription = "Shelves icon")
                                                             Route.FavoriteList -> Icon(Icons.Default.Favorite, contentDescription = "Favorites icon")
+                                                            Route.ReadingList -> Icon(Icons.Default.List, contentDescription = "Reading list icon")
                                                             else -> Icon(Icons.Default.Lock, contentDescription = "?")
                                                         }
                                                     },
@@ -214,7 +218,7 @@ class MainActivity : ComponentActivity() {
                                         BookListScreenRoot(
                                             onBookSelect = { book ->
                                                 selectedBookViewModel.onBookSelect(book)
-                                                navController.navigate(Route.BookDetails(book.bookId, book.bookTitle))
+                                                navController.navigate(Route.BookDetails(book.bookId))
                                             }
                                         )
                                     }
@@ -225,7 +229,7 @@ class MainActivity : ComponentActivity() {
                                 Scaffold(
                                     topBar = {
                                         CenterAlignedTopAppBar(
-                                            title = { Text(it.arguments?.getString("bookTitle") ?: "Book details") },
+                                            title = { Text("Book details") },
                                             navigationIcon = {
                                                 IconButton(onClick = { navController.popBackStack() }) {
                                                     Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -247,7 +251,7 @@ class MainActivity : ComponentActivity() {
                                         BookDetailsScreenRoot(
                                             onBackClick = { navController.popBackStack() },
                                             onEditClick = { navController.navigate(Route.EditBook(it.arguments?.getInt("bookId") ?: -1)) },
-                                            onDeleteClick = { navController.navigate(Route.BookList) { popUpTo(Route.BookDetails(it.arguments?.getInt("bookId") ?: -1, it.arguments?.getString("bookTitle") ?: "")) { inclusive = true } } },
+                                            onDeleteClick = { navController.navigate(Route.BookList) { popUpTo(Route.BookDetails(it.arguments?.getInt("bookId") ?: -1)) { inclusive = true } } },
                                             bookId = it.arguments?.getInt("bookId") ?: -1
                                         )
                                     }
@@ -292,12 +296,14 @@ class MainActivity : ComponentActivity() {
                                             listOf(
                                                 Route.BookList,
                                                 Route.LocationList,
-                                                Route.FavoriteList
+                                                Route.FavoriteList,
+                                                Route.ReadingList
                                             ).forEach { route ->
                                                 val title = when (route) {
                                                     Route.BookList -> "Books"
                                                     Route.LocationList -> "Locations"
                                                     Route.FavoriteList -> "Favorites"
+                                                    Route.ReadingList -> "Reading list"
                                                     else -> ""
                                                 }
                                                 NavigationBarItem(
@@ -312,6 +318,7 @@ class MainActivity : ComponentActivity() {
                                                             Route.BookList -> Icon(painterResource(R.drawable.book_icon), contentDescription = "Books icon")
                                                             Route.LocationList -> Icon(painterResource(R.drawable.shelves_icon), contentDescription = "Shelves icon")
                                                             Route.FavoriteList -> Icon(Icons.Default.Favorite, contentDescription = "Favorites icon")
+                                                            Route.ReadingList -> Icon(Icons.Default.List, contentDescription = "Reading list icon")
                                                             else -> Icon(Icons.Default.Lock, contentDescription = "?")
                                                         }
                                                     },
@@ -336,7 +343,7 @@ class MainActivity : ComponentActivity() {
                                         FavoriteBookListScreenRoot(
                                             onBookSelect = { book ->
                                                 selectedBookViewModel.onBookSelect(book)
-                                                navController.navigate(Route.BookDetails(book.bookId, book.bookTitle))
+                                                navController.navigate(Route.BookDetails(book.bookId))
                                             }
                                         )
                                     }
@@ -381,12 +388,14 @@ class MainActivity : ComponentActivity() {
                                             listOf(
                                                 Route.BookList,
                                                 Route.LocationList,
-                                                Route.FavoriteList
+                                                Route.FavoriteList,
+                                                Route.ReadingList
                                             ).forEach { route ->
                                                 val title = when (route) {
                                                     Route.BookList -> "Books"
                                                     Route.LocationList -> "Locations"
                                                     Route.FavoriteList -> "Favorites"
+                                                    Route.ReadingList -> "Reading list"
                                                     else -> ""
                                                 }
                                                 NavigationBarItem(
@@ -401,6 +410,7 @@ class MainActivity : ComponentActivity() {
                                                             Route.BookList -> Icon(painterResource(R.drawable.book_icon), contentDescription = "Books icon")
                                                             Route.LocationList -> Icon(painterResource(R.drawable.shelves_icon), contentDescription = "Shelves icon")
                                                             Route.FavoriteList -> Icon(Icons.Default.Favorite, contentDescription = "Favorites icon")
+                                                            Route.ReadingList -> Icon(Icons.Default.List, contentDescription = "Reading list icon")
                                                             else -> Icon(Icons.Default.Lock, contentDescription = "?")
                                                         }
                                                     },
@@ -432,6 +442,89 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
 
+                            composable<Route.ReadingList> {
+                                val selectedBookViewModel = it.sharedViewModel<SelectedBookViewModel>(navController)
+
+                                Scaffold(
+                                    topBar = {
+                                        CenterAlignedTopAppBar(
+                                            title = {
+                                                Row(
+                                                    verticalAlignment = CenterVertically,
+                                                ) {
+                                                    Image(
+                                                        modifier = Modifier
+                                                            .size(32.dp)
+                                                            .clip(MaterialTheme.shapes.small),
+                                                        painter = painterResource(R.drawable.ic_launcher_playstore),
+                                                        contentDescription = "App logo"
+                                                    )
+                                                    Spacer(modifier = Modifier.width(8.dp))
+                                                    Text(
+                                                        text = "BookApp",
+                                                        style = MaterialTheme.typography.displaySmall
+                                                    )
+                                                }
+                                            },
+                                            colors = TopAppBarColors(
+                                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                                scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                                titleContentColor = MaterialTheme.colorScheme.primary,
+                                                navigationIconContentColor = MaterialTheme.colorScheme.primary,
+                                                actionIconContentColor = MaterialTheme.colorScheme.primary,
+                                            )
+                                        )
+                                    },
+                                    bottomBar = {
+                                        NavigationBar {
+                                            listOf(
+                                                Route.BookList,
+                                                Route.LocationList,
+                                                Route.FavoriteList,
+                                                Route.ReadingList
+                                            ).forEach { route ->
+                                                val title = when (route) {
+                                                    Route.BookList -> "Books"
+                                                    Route.LocationList -> "Locations"
+                                                    Route.FavoriteList -> "Favorites"
+                                                    Route.ReadingList -> "Reading list"
+                                                    else -> ""
+                                                }
+                                                NavigationBarItem(
+                                                    selected = route == Route.ReadingList,
+                                                    onClick = {
+                                                        navController.navigate(route) {
+                                                            popUpTo(Route.ReadingList) { inclusive = true }
+                                                        }
+                                                    },
+                                                    icon = {
+                                                        when (route) {
+                                                            Route.BookList -> Icon(painterResource(R.drawable.book_icon), contentDescription = "Books icon")
+                                                            Route.LocationList -> Icon(painterResource(R.drawable.shelves_icon), contentDescription = "Shelves icon")
+                                                            Route.FavoriteList -> Icon(Icons.Default.Favorite, contentDescription = "Favorites icon")
+                                                            Route.ReadingList -> Icon(Icons.Default.List, contentDescription = "Reading list icon")
+                                                            else -> Icon(Icons.Default.Lock, contentDescription = "?")
+                                                        }
+                                                    },
+                                                    label = { Text(title) }
+                                                )
+                                            }
+                                        }
+                                    }
+                                ) { innerPadding ->
+                                    Column(
+                                        modifier = Modifier.padding(top = 72.dp, bottom = innerPadding.calculateBottomPadding())
+                                    ) {
+                                        ReadingListScreenRoot(
+                                            onBookSelect = { book ->
+                                                selectedBookViewModel.onBookSelect(book)
+                                                navController.navigate(Route.BookDetails(book.bookId))
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+
                             composable<Route.LocationDetails> {
                                 val locationName = db.locationDao().getLocationNameById(it.arguments?.getInt("locationId") ?: -1)
 
@@ -457,6 +550,15 @@ class MainActivity : ComponentActivity() {
                                                 actionIconContentColor = MaterialTheme.colorScheme.primary,
                                             )
                                         )
+                                    },
+                                    floatingActionButton = {
+                                        ExtendedFloatingActionButton(
+                                            text = { Text("Add book") },
+                                            icon = { Icon(Icons.Default.Add, contentDescription = "Add book") },
+                                            onClick = { navController.navigate(Route.AddBook) },
+                                            backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
+                                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                                        )
                                     }
                                 ) { innerPadding ->
                                     Column(
@@ -464,7 +566,7 @@ class MainActivity : ComponentActivity() {
                                     ) {
                                         LocationDetailsScreenRoot(
                                             onBookSelect = { book ->
-                                                navController.navigate(Route.BookDetails(book.bookId, book.bookTitle))
+                                                navController.navigate(Route.BookDetails(book.bookId))
                                             },
                                             locationId = it.arguments?.getInt("locationId") ?: -1
                                         )
@@ -559,7 +661,10 @@ class MainActivity : ComponentActivity() {
                                     ) {
                                         EditBookScreenRoot(
                                             onBackClick = { navController.popBackStack() },
-                                            onBookSave = { navController.navigate(Route.BookDetails(it.arguments?.getInt("bookId") ?: -1)) { popUpTo(Route.BookDetails(it.arguments?.getInt("bookId") ?: -1)) {inclusive = true} } },
+                                            onBookSave = { navController.navigate(Route.BookDetails(it.arguments?.getInt("bookId") ?: -1)) {
+                                                navController.popBackStack()
+                                                navController.popBackStack()
+                                            } },
                                             bookId = it.arguments?.getInt("bookId") ?: -1
                                         )
                                     }

@@ -1,4 +1,4 @@
-package com.example.bachelorv1.ui.book_list
+package com.example.bachelorv1.ui.reading_list
 
 import android.net.Uri
 import androidx.compose.foundation.Image
@@ -6,37 +6,35 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -46,18 +44,19 @@ import coil.compose.AsyncImage
 import com.example.bachelorv1.MainActivity
 import com.example.bachelorv1.R
 import com.example.bachelorv1.data.Book
+import com.example.bachelorv1.ui.book_list.BookListAction
 
 @Composable
-fun BookListScreenRoot(
+fun ReadingListScreenRoot(
     onBookSelect: (Book) -> Unit
 ) {
     val bookDao = MainActivity.db.bookDao()
-    val viewModel: BookListViewModel = viewModel(factory = object : ViewModelProvider.Factory {
+    val viewModel: ReadingListViewModel = viewModel(factory = object : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(BookListViewModel::class.java))
+            if (modelClass.isAssignableFrom(ReadingListViewModel::class.java))
             {
-                return BookListViewModel(bookDao)
-                as T
+                return ReadingListViewModel(bookDao)
+                        as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }
@@ -65,7 +64,7 @@ fun BookListScreenRoot(
 
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    BookListScreen(
+    ReadingListScreen(
         state = state,
         onAction = { action ->
             when (action) {
@@ -77,76 +76,32 @@ fun BookListScreenRoot(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookListScreen(
-    state: BookListState,
+fun ReadingListScreen(
+    state: ReadingListState,
     onAction: (BookListAction) -> Unit
 ) {
     val locationDao = MainActivity.db.locationDao()
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    val searchResultsListState = rememberLazyListState()
-
-    LaunchedEffect(state.searchResults) {
-        searchResultsListState.animateScrollToItem(0)
-    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        ) {
-            SearchBar(
-                query = state.searchQuery,
-                onQueryChange = { onAction(BookListAction.OnSearchQueryChange(it)) },
-                onSearch = { keyboardController?.hide() },
-                placeholder = { Text("Search for a book...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
-                trailingIcon = {
-                    if (state.searchQuery.isNotBlank()) {
-                        IconButton(onClick = { onAction(BookListAction.OnSearchQueryChange("")) }) {
-                            Icon(Icons.Filled.Clear, contentDescription = "Clear")
-                        }
-                    }
-                },
-                active = false,
-                onActiveChange = {},
-            ) { }
-        }
-
+        Spacer(modifier = Modifier.height(48.dp))
         LazyColumn {
-            val booksToDisplay = if (state.searchQuery.isBlank()) state.books else state.searchResults
+            val booksToDisplay = state.readingListBooks
 
-            if (state.searchQuery.length > 2 && state.searchResults.isEmpty()) {
+            if (booksToDisplay.isEmpty()) {
                 item {
                     Text(
-                        text = "No books found",
+                        text = "No books on reading list",
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
             }
-
-            if (booksToDisplay.isEmpty() && state.searchQuery.isBlank()) {
-                item {
-                    Text(
-                        text = "No books found",
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-            }
-
-
-
 
             for (book in booksToDisplay) {
                 item {
@@ -204,19 +159,19 @@ fun BookListScreen(
                                     text = book.bookTitle,
                                     style = MaterialTheme.typography.titleLarge,
                                     maxLines = 2,
-                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                    overflow = TextOverflow.Ellipsis
                                 )
                                 Text(
                                     text = book.bookAuthor,
                                     style = MaterialTheme.typography.titleMedium,
                                     maxLines = 2,
-                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                    overflow = TextOverflow.Ellipsis
                                 )
                                 Text(
                                     text = locationDao.getLocationNameById(book.locationId),
                                     style = MaterialTheme.typography.titleSmall,
                                     maxLines = 1,
-                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
                         }

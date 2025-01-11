@@ -1,5 +1,6 @@
 package com.example.bachelorv1.ui.edit_book
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bachelorv1.data.BookDao
@@ -36,15 +37,17 @@ class EditBookViewModel(
 
     fun onAction(action: EditBookAction) {
         when (action) {
+            is EditBookAction.SetPhoto -> _state.update { it.copy(photo = action.photo) }
             is EditBookAction.SetTitle -> _state.update { it.copy(title = action.title) }
             is EditBookAction.SetAuthor -> _state.update { it.copy(author = action.author) }
             is EditBookAction.SetGenre -> _state.update { it.copy(selectedGenres = action.genres) }
             is EditBookAction.SetLocation -> _state.update { it.copy(selectedLocation = action.location) }
-            is EditBookAction.SetEdition -> _state.update { it.copy(edition = action.edition) }
+            is EditBookAction.SetNote -> _state.update { it.copy(note = action.note) }
+            is EditBookAction.SetCost -> _state.update { it.copy(cost = action.cost) }
             is EditBookAction.SetIsGenreExpanded -> _state.update { it.copy(isGenreExpanded = action.isExpanded) }
             is EditBookAction.SetIsLocationExpanded -> _state.update { it.copy(isLocationExpanded = action.isExpanded) }
             is EditBookAction.SaveBook -> {
-                if (state.value.title.isBlank() || state.value.author.isBlank() || state.value.selectedLocation.isBlank() || state.value.selectedGenres.isEmpty()) {
+                if (state.value.title.isBlank() || state.value.author.isBlank() || state.value.selectedLocation.isBlank()) {
                     _state.update { it.copy(showError = true) }
                 } else {
                     _state.update { it.copy(showError = false) }
@@ -59,22 +62,36 @@ class EditBookViewModel(
         viewModelScope.launch {
             val book = bookDao.getBookById(bookId)
             val bookGenres = state.value.selectedGenres.map { genreDao.getGenreIdByName(it) }
+            if (book.bookPhoto != state.value.photo) {
+                bookDao.updateBookPhoto(bookId, state.value.photo)
+            }
             if (book.bookTitle != state.value.title) {
                 bookDao.updateBookTitle(bookId, state.value.title)
             }
             if (book.bookAuthor != state.value.author) {
-                bookDao.updateBookTitle(bookId, state.value.author)
+                bookDao.updateBookAuthor(bookId, state.value.author)
             }
             if (book.locationId != locationDao.getLocationIdByName(state.value.selectedLocation)) {
                 bookDao.updateBookLocation(bookId, locationDao.getLocationIdByName(state.value.selectedLocation))
             }
-            if (bookGenres != state.value.selectedGenres) {
+            if (bookGenres != state.value.selectedGenres && bookGenres.isNotEmpty()) {
                 bookDao.deleteBookGenreCrossRef(bookId)
-                val newBookGenres = state.value.selectedGenres.map { genreName -> BookGenreCrossRef(bookId, genreDao.getGenreIdByName(genreName)) }
+                val newBookGenres = state.value.selectedGenres.map { genreName ->
+                    BookGenreCrossRef(
+                        bookId,
+                        genreDao.getGenreIdByName(genreName)
+                    )
+                }
                 bookDao.insertBookGenreCrossRef(newBookGenres)
             }
-            if (book.bookEdition != state.value.edition) {
-                bookDao.updateBookEdition(bookId, state.value.edition.toString())
+            if (bookGenres.isEmpty()) {
+                bookDao.deleteBookGenreCrossRef(bookId)
+            }
+            if (book.bookNote != state.value.note) {
+                bookDao.updateBookNote(bookId, state.value.note.toString())
+            }
+            if (book.bookCost != state.value.cost) {
+                bookDao.updateBookCost(bookId, state.value.cost.toString())
             }
         }
     }
@@ -86,11 +103,13 @@ class EditBookViewModel(
             _state.update {
                 it.copy(
                     book = book,
+                    photo = book.bookPhoto.toString(),
                     title = book.bookTitle,
                     author = book.bookAuthor,
                     selectedLocation = locationDao.getLocationNameById(book.locationId),
                     selectedGenres = bookGenresIds.map { genreId -> genreDao.getGenreNameById(genreId) },
-                    edition = book.bookEdition,
+                    note = book.bookNote,
+                    cost = book.bookCost,
                     isLoading = false
                 )
             }

@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -34,13 +36,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.bachelorv1.MainActivity
 import com.example.bachelorv1.R
+import com.example.bachelorv1.photoPicker
+import com.example.bachelorv1.ui.add_book.AddBookAction
 
 @Composable
 fun EditBookScreenRoot(
@@ -93,33 +99,32 @@ fun EditBookScreen(
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
-            Image(
-                modifier = Modifier
-                    .size(width = 144.dp, height = 192.dp)
-                    .clip(MaterialTheme.shapes.small),
-                contentScale = ContentScale.FillHeight,
-                painter = painterResource(R.drawable.test_pic),
-                contentDescription = null
-            )
+            if (state.photo == "") {
+                Image(
+                    modifier = Modifier
+                        .size(width = 144.dp, height = 192.dp)
+                        .clip(MaterialTheme.shapes.small),
+                    contentScale = ContentScale.FillHeight,
+                    painter = painterResource(R.drawable.test_pic),
+                    contentDescription = "Default book photo"
+                )
+            }
+            else {
+                AsyncImage(
+                    model = state.photo,
+                    modifier = Modifier
+                        .size(width = 144.dp, height = 192.dp)
+                        .clip(MaterialTheme.shapes.small),
+                    contentScale = ContentScale.FillWidth,
+                    contentDescription = "Book photo"
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Button(
-                modifier = Modifier
-                    .width(144.dp),
-                onClick = {/*Add a photo*/ }
-            ) {
-                Icon(painterResource(R.drawable.add_photo_icon), contentDescription = "Add photo")
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Add photo", style = MaterialTheme.typography.labelMedium)
-            }
-        }
+        var photo = photoPicker("Edit photo")
+        if (photo != null) { onAction(EditBookAction.SetPhoto(photo)) }
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -129,162 +134,234 @@ fun EditBookScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Column {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    TextField(
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                item {
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.LightGray, MaterialTheme.shapes.small),
-                        value = state.title,
-                        onValueChange = { onAction(EditBookAction.SetTitle(it)) },
-                        label = { Text("Book title") }
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    TextField(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.LightGray, MaterialTheme.shapes.small),
-                        value = state.author,
-                        onValueChange = { onAction(EditBookAction.SetAuthor(it)) },
-                        label = { Text("Author's name") }
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Box {
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
                         TextField(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(Color.LightGray, MaterialTheme.shapes.small),
-                            value = state.selectedGenres.joinToString(" | "),
-                            onValueChange = {},
-                            label = { Text("Genres") },
-                            readOnly = true,
-                            trailingIcon = {
-                                if (state.isGenreExpanded == false) {
-                                    IconButton(onClick = { onAction(EditBookAction.SetIsGenreExpanded(true)) }) { Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Genres list") }
-                                }
-                                else {
-                                    IconButton(onClick = { onAction(EditBookAction.SetIsGenreExpanded(false)) }) { Icon(Icons.Filled.KeyboardArrowUp, contentDescription = "Genres list") }
-                                }
-                            },
-                            placeholder = { Text("Select at least one genre") }
+                            value = state.title,
+                            onValueChange = { onAction(EditBookAction.SetTitle(it)) },
+                            label = { Text("Book title") }
                         )
-                        DropdownMenu(
-                            expanded = state.isGenreExpanded,
-                            onDismissRequest = { onAction(EditBookAction.SetIsGenreExpanded(false)) }
-                        ) {
-                            state.genres.forEach { genre ->
-                                val updatedGenres = state.selectedGenres.toMutableList()
-                                DropdownMenuItem(
-                                    text = {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.SpaceBetween
-                                        ) {
-                                            Text(genre.genreName)
-                                            Checkbox(
-                                                checked = state.selectedGenres.contains(genre.genreName),
-                                                onCheckedChange = { isChecked ->
-                                                    if (isChecked) {
-                                                        updatedGenres.add(genre.genreName)
-                                                    } else {
-                                                        updatedGenres.remove(genre.genreName)
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        TextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.LightGray, MaterialTheme.shapes.small),
+                            value = state.author,
+                            onValueChange = { onAction(EditBookAction.SetAuthor(it)) },
+                            label = { Text("Author's name") }
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Box {
+                            TextField(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color.LightGray, MaterialTheme.shapes.small),
+                                value = state.selectedGenres.joinToString(" | "),
+                                onValueChange = {},
+                                label = { Text("Genres") },
+                                readOnly = true,
+                                trailingIcon = {
+                                    if (state.isGenreExpanded == false) {
+                                        IconButton(onClick = {
+                                            onAction(
+                                                EditBookAction.SetIsGenreExpanded(
+                                                    true
+                                                )
+                                            )
+                                        }) {
+                                            Icon(
+                                                Icons.Filled.KeyboardArrowDown,
+                                                contentDescription = "Genres list"
+                                            )
+                                        }
+                                    } else {
+                                        IconButton(onClick = {
+                                            onAction(
+                                                EditBookAction.SetIsGenreExpanded(
+                                                    false
+                                                )
+                                            )
+                                        }) {
+                                            Icon(
+                                                Icons.Filled.KeyboardArrowUp,
+                                                contentDescription = "Genres list"
+                                            )
+                                        }
+                                    }
+                                },
+                                placeholder = { Text("Select at least one genre") }
+                            )
+                            DropdownMenu(
+                                expanded = state.isGenreExpanded,
+                                onDismissRequest = { onAction(EditBookAction.SetIsGenreExpanded(false)) }
+                            ) {
+                                state.genres.forEach { genre ->
+                                    val updatedGenres = state.selectedGenres.toMutableList()
+                                    DropdownMenuItem(
+                                        text = {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.SpaceBetween
+                                            ) {
+                                                Text(genre.genreName)
+                                                Checkbox(
+                                                    checked = state.selectedGenres.contains(genre.genreName),
+                                                    onCheckedChange = { isChecked ->
+                                                        if (isChecked) {
+                                                            updatedGenres.add(genre.genreName)
+                                                        } else {
+                                                            updatedGenres.remove(genre.genreName)
+                                                        }
+                                                        onAction(EditBookAction.SetGenre(updatedGenres))
                                                     }
-                                                    onAction(EditBookAction.SetGenre(updatedGenres))
-                                                }
-                                            )
-                                        }
-                                    },
-                                    onClick = { onAction(EditBookAction.SetGenre(updatedGenres)) }
-                                )
+                                                )
+                                            }
+                                        },
+                                        onClick = { onAction(EditBookAction.SetGenre(updatedGenres)) }
+                                    )
+                                }
                             }
                         }
                     }
-                }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Box {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Box {
+                            TextField(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color.LightGray, MaterialTheme.shapes.small),
+                                value = state.selectedLocation,
+                                onValueChange = {},
+                                label = { Text("Location") },
+                                readOnly = true,
+                                trailingIcon = {
+                                    if (state.isLocationExpanded == false) {
+                                        IconButton(onClick = {
+                                            onAction(
+                                                EditBookAction.SetIsLocationExpanded(
+                                                    true
+                                                )
+                                            )
+                                        }) {
+                                            Icon(
+                                                Icons.Filled.KeyboardArrowDown,
+                                                contentDescription = "Locations list"
+                                            )
+                                        }
+                                    } else {
+                                        IconButton(onClick = {
+                                            onAction(
+                                                EditBookAction.SetIsLocationExpanded(
+                                                    false
+                                                )
+                                            )
+                                        }) {
+                                            Icon(
+                                                Icons.Filled.KeyboardArrowUp,
+                                                contentDescription = "Locations list"
+                                            )
+                                        }
+                                    }
+                                },
+                                placeholder = { Text("Select location") },
+                            )
+                            DropdownMenu(
+                                expanded = state.isLocationExpanded,
+                                onDismissRequest = { onAction(EditBookAction.SetIsLocationExpanded(false)) }
+                            ) {
+                                state.locations.forEach { location ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.SpaceBetween
+                                            ) {
+                                                RadioButton(
+                                                    selected = state.selectedLocation == location.locationName,
+                                                    onClick = {
+                                                        onAction(
+                                                            EditBookAction.SetLocation(
+                                                                location.locationName
+                                                            )
+                                                        )
+                                                    }
+                                                )
+                                                Text(location.locationName)
+                                            }
+                                        },
+                                        onClick = { onAction(EditBookAction.SetLocation(location.locationName)) }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
                         TextField(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(Color.LightGray, MaterialTheme.shapes.small),
-                            value = state.selectedLocation,
-                            onValueChange = {},
-                            label = { Text("Location") },
-                            readOnly = true,
-                            trailingIcon = {
-                                if (state.isLocationExpanded == false) {
-                                    IconButton(onClick = { onAction(EditBookAction.SetIsLocationExpanded(true)) }) { Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "Locations list") }
-                                }
-                                else {
-                                    IconButton(onClick = { onAction(EditBookAction.SetIsLocationExpanded(false)) }) { Icon(Icons.Filled.KeyboardArrowUp, contentDescription = "Locations list") }
-                                }
-                            },
-                            placeholder = { Text("Select location") },
+                            value = state.note ?: "",
+                            onValueChange = { onAction(EditBookAction.SetNote(it)) },
+                            label = { Text("Note on book") },
+                            placeholder = { Text("Optional") }
                         )
-                        DropdownMenu(
-                            expanded = state.isLocationExpanded,
-                            onDismissRequest = { onAction(EditBookAction.SetIsLocationExpanded(false)) }
-                        ) {
-                            state.locations.forEach { location ->
-                                DropdownMenuItem(
-                                    text = {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.SpaceBetween
-                                        ) {
-                                            RadioButton(
-                                                selected = state.selectedLocation == location.locationName,
-                                                onClick = { onAction(EditBookAction.SetLocation(location.locationName)) }
-                                            )
-                                            Text(location.locationName)
-                                        }
-                                    },
-                                    onClick = { onAction(EditBookAction.SetLocation(location.locationName)) }
-                                )
-                            }
-                        }
                     }
-                }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    TextField(
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.LightGray, MaterialTheme.shapes.small),
-                        value = state.edition ?: "",
-                        onValueChange = { onAction(EditBookAction.SetEdition(it)) },
-                        label = { Text("Book's edition") },
-                        placeholder = { Text("Optional") }
-                    )
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        TextField(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.LightGray, MaterialTheme.shapes.small),
+                            value = state.cost ?: "",
+                            onValueChange = { onAction(EditBookAction.SetCost(it)) },
+                            label = { Text("Book's cost") },
+                            placeholder = { Text("Optional") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        )
+                    }
                 }
             }
 
@@ -308,7 +385,7 @@ fun EditBookScreen(
                         .fillMaxWidth(),
                     onClick = {
                         onAction(EditBookAction.SaveBook)
-                        if (state.title.isNotBlank() && state.author.isNotBlank() && state.selectedLocation.isNotBlank() && state.selectedGenres.isNotEmpty()) {
+                        if (state.title.isNotBlank() && state.author.isNotBlank() && state.selectedLocation.isNotBlank()) {
                             onAction(EditBookAction.OnBookSave)
                         }
                     }

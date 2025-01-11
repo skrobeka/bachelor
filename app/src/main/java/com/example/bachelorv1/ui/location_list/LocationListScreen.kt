@@ -123,7 +123,7 @@ fun LocationListScreen(
                 }
             }
 
-            if (locationsToDisplay.isEmpty()) {
+            if (locationsToDisplay.isEmpty() && state.searchQuery.isBlank()) {
                 item {
                     Text(
                         text = "No locations found",

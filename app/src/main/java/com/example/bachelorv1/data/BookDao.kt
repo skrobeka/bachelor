@@ -16,8 +16,14 @@ interface BookDao {
     fun deleteBook(book: Book)
 
     //Queries
+    @Query("UPDATE book SET bookPhoto = :newPhoto WHERE bookId = :bookId")
+    fun updateBookPhoto(bookId: Int, newPhoto: String)
+
     @Query("UPDATE book SET bookIsFavorite = :isFavorite WHERE bookId = :bookId")
     fun updateBookFavoriteStatus(bookId: Int, isFavorite: Boolean)
+
+    @Query("UPDATE book SET bookIsOnReadingList = :isOnReadingList WHERE bookId = :bookId")
+    fun updateBookReadingListStatus(bookId: Int, isOnReadingList: Boolean)
 
     @Query("UPDATE book SET bookIsRead = :isRead WHERE bookId = :bookId")
     fun updateBookReadStatus(bookId: Int, isRead: Boolean)
@@ -28,8 +34,11 @@ interface BookDao {
     @Query("UPDATE book SET bookAuthor = :newAuthor WHERE bookId = :bookId")
     fun updateBookAuthor(bookId: Int, newAuthor: String)
 
-    @Query("UPDATE book SET bookEdition = :newEdition WHERE bookId = :bookId")
-    fun updateBookEdition(bookId: Int, newEdition: String)
+    @Query("UPDATE book SET bookNote = :newNote WHERE bookId = :bookId")
+    fun updateBookNote(bookId: Int, newNote: String)
+
+    @Query("UPDATE book SET bookCost = :newCost WHERE bookId = :bookId")
+    fun updateBookCost(bookId: Int, newCost: String)
 
     @Query("UPDATE book SET locationId = :newLocationId WHERE bookId = :bookId")
     fun updateBookLocation(bookId: Int, newLocationId: Int)
@@ -73,11 +82,17 @@ interface BookDao {
     @Query("SELECT bookIsFavorite FROM book WHERE bookId = :bookId")
     fun isBookFavorite(bookId: Int): Flow<Boolean>
 
+    @Query("SELECT bookIsOnReadingList FROM book WHERE bookId = :bookId")
+    fun isBookOnReadingList(bookId: Int): Flow<Boolean>
+
     @Query("SELECT bookIsRead FROM book WHERE bookId = :bookId")
     fun isBookRead(bookId: Int): Flow<Boolean>
 
     @Query("SELECT * FROM book WHERE bookIsFavorite = 1 ORDER BY bookTitle ASC")
     fun getFavoriteBooks(): Flow<List<Book>>
+
+    @Query("SELECT * FROM book WHERE bookIsOnReadingList = 1 ORDER BY bookTitle ASC")
+    fun getReadingListBooks(): Flow<List<Book>>
 
     @Transaction
     @Query("SELECT genreId FROM bookgenre WHERE bookId = :bookId")

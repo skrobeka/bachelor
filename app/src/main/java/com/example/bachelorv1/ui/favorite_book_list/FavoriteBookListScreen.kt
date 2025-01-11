@@ -1,5 +1,6 @@
 package com.example.bachelorv1.ui.favorite_book_list
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +42,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.bachelorv1.MainActivity
 import com.example.bachelorv1.R
 import com.example.bachelorv1.data.Book
@@ -156,14 +158,27 @@ fun FavoriteBookListScreen(
                     ) {
                         Row {
                             Box {
-                                Image(
-                                    modifier = Modifier
-                                        .size(width = 144.dp, height = 192.dp)
-                                        .clip(MaterialTheme.shapes.small),
-                                    contentScale = ContentScale.FillHeight,
-                                    painter = painterResource(R.drawable.test_pic),
-                                    contentDescription = null
-                                )
+                                if (book.bookPhoto == null || book.bookPhoto == "") {
+                                    Image(
+                                        modifier = Modifier
+                                            .size(width = 144.dp, height = 192.dp)
+                                            .clip(MaterialTheme.shapes.small),
+                                        contentScale = ContentScale.FillHeight,
+                                        painter = painterResource(R.drawable.test_pic),
+                                        contentDescription = "Default book photo"
+                                    )
+                                }
+                                else {
+                                    val bookUri = Uri.parse(book.bookPhoto)
+                                    AsyncImage(
+                                        model = bookUri,
+                                        modifier = Modifier
+                                            .size(width = 144.dp, height = 192.dp)
+                                            .clip(MaterialTheme.shapes.small),
+                                        contentScale = ContentScale.FillWidth,
+                                        contentDescription = "Book photo"
+                                    )
+                                }
                                 if (book.bookIsFavorite) {
                                     Icon(
                                         imageVector = Icons.Filled.Favorite,
@@ -191,11 +206,15 @@ fun FavoriteBookListScreen(
                                 )
                                 Text(
                                     text = book.bookAuthor,
-                                    style = MaterialTheme.typography.titleMedium
+                                    style = MaterialTheme.typography.titleMedium,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                                 Text(
                                     text = locationDao.getLocationNameById(book.locationId),
-                                    style = MaterialTheme.typography.titleSmall
+                                    style = MaterialTheme.typography.titleSmall,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
                         }
