@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -157,6 +158,11 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                 }
                                             },
+                                            actions = {
+                                                IconButton(onClick = {  }) {
+                                                    Icon(Icons.Default.MoreVert, contentDescription = "Export/import database")
+                                                }
+                                            },
                                             colors = TopAppBarColors(
                                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                                                 scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -178,7 +184,7 @@ class MainActivity : ComponentActivity() {
                                                     Route.BookList -> "Books"
                                                     Route.LocationList -> "Locations"
                                                     Route.FavoriteList -> "Favorites"
-                                                    Route.ReadingList -> "Reading list"
+                                                    Route.ReadingList -> "To Read list"
                                                     else -> ""
                                                 }
                                                 NavigationBarItem(
@@ -282,6 +288,11 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                 }
                                             },
+                                            actions = {
+                                                IconButton(onClick = {  }) {
+                                                    Icon(Icons.Default.MoreVert, contentDescription = "Export/import database")
+                                                }
+                                            },
                                             colors = TopAppBarColors(
                                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                                                 scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -303,7 +314,7 @@ class MainActivity : ComponentActivity() {
                                                     Route.BookList -> "Books"
                                                     Route.LocationList -> "Locations"
                                                     Route.FavoriteList -> "Favorites"
-                                                    Route.ReadingList -> "Reading list"
+                                                    Route.ReadingList -> "To Read list"
                                                     else -> ""
                                                 }
                                                 NavigationBarItem(
@@ -374,6 +385,11 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                 }
                                             },
+                                            actions = {
+                                                IconButton(onClick = {  }) {
+                                                    Icon(Icons.Default.MoreVert, contentDescription = "Export/import database")
+                                                }
+                                            },
                                             colors = TopAppBarColors(
                                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                                                 scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -395,7 +411,7 @@ class MainActivity : ComponentActivity() {
                                                     Route.BookList -> "Books"
                                                     Route.LocationList -> "Locations"
                                                     Route.FavoriteList -> "Favorites"
-                                                    Route.ReadingList -> "Reading list"
+                                                    Route.ReadingList -> "To Read list"
                                                     else -> ""
                                                 }
                                                 NavigationBarItem(
@@ -466,6 +482,11 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                 }
                                             },
+                                            actions = {
+                                                IconButton(onClick = {  }) {
+                                                    Icon(Icons.Default.MoreVert, contentDescription = "Export/import database")
+                                                }
+                                            },
                                             colors = TopAppBarColors(
                                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                                                 scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -487,7 +508,7 @@ class MainActivity : ComponentActivity() {
                                                     Route.BookList -> "Books"
                                                     Route.LocationList -> "Locations"
                                                     Route.FavoriteList -> "Favorites"
-                                                    Route.ReadingList -> "Reading list"
+                                                    Route.ReadingList -> "To Read list"
                                                     else -> ""
                                                 }
                                                 NavigationBarItem(

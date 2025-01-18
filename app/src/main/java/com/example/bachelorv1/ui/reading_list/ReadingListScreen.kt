@@ -95,7 +95,7 @@ fun ReadingListScreen(
             if (booksToDisplay.isEmpty()) {
                 item {
                     Text(
-                        text = "No books on reading list",
+                        text = "No books on To Read list",
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyLarge

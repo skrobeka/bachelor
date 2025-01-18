@@ -173,7 +173,7 @@ fun BookDetailsScreen(
                             .fillMaxWidth(),
                         onClick = { onAction(BookDetailsAction.OnReadingListClick) }
                     ) {
-                        Icon(painterResource(R.drawable.playlist_remove_icon), contentDescription = "Remove from reading list")
+                        Icon(painterResource(R.drawable.playlist_remove_icon), contentDescription = "Remove from To Read list")
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(text = "Remove from reading list", style = MaterialTheme.typography.labelMedium)
                     }
@@ -184,7 +184,7 @@ fun BookDetailsScreen(
                             .fillMaxWidth(),
                         onClick = { onAction(BookDetailsAction.OnReadingListClick) }
                     ) {
-                        Icon(painterResource(R.drawable.playlist_add_icon), contentDescription = "Add to reading list")
+                        Icon(painterResource(R.drawable.playlist_add_icon), contentDescription = "Add to To Read list")
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(text = "Add to reading list", style = MaterialTheme.typography.labelMedium)
                     }
