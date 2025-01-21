@@ -46,7 +46,6 @@ import coil.compose.AsyncImage
 import com.example.bachelorv1.MainActivity
 import com.example.bachelorv1.R
 import com.example.bachelorv1.photoPicker
-import com.example.bachelorv1.ui.add_book.AddBookAction
 
 @Composable
 fun EditBookScreenRoot(
@@ -183,6 +182,83 @@ fun EditBookScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .background(Color.LightGray, MaterialTheme.shapes.small),
+                                value = state.selectedLocation,
+                                onValueChange = {},
+                                label = { Text("Location") },
+                                readOnly = true,
+                                trailingIcon = {
+                                    if (state.isLocationExpanded == false) {
+                                        IconButton(onClick = {
+                                            onAction(
+                                                EditBookAction.SetIsLocationExpanded(
+                                                    true
+                                                )
+                                            )
+                                        }) {
+                                            Icon(
+                                                Icons.Filled.KeyboardArrowDown,
+                                                contentDescription = "Locations list"
+                                            )
+                                        }
+                                    } else {
+                                        IconButton(onClick = {
+                                            onAction(
+                                                EditBookAction.SetIsLocationExpanded(
+                                                    false
+                                                )
+                                            )
+                                        }) {
+                                            Icon(
+                                                Icons.Filled.KeyboardArrowUp,
+                                                contentDescription = "Locations list"
+                                            )
+                                        }
+                                    }
+                                },
+                                placeholder = { Text("Select location") },
+                            )
+                            DropdownMenu(
+                                expanded = state.isLocationExpanded,
+                                onDismissRequest = { onAction(EditBookAction.SetIsLocationExpanded(false)) }
+                            ) {
+                                state.locations.forEach { location ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.SpaceBetween
+                                            ) {
+                                                RadioButton(
+                                                    selected = state.selectedLocation == location.locationName,
+                                                    onClick = {
+                                                        onAction(
+                                                            EditBookAction.SetLocation(
+                                                                location.locationName
+                                                            )
+                                                        )
+                                                    }
+                                                )
+                                                Text(location.locationName)
+                                            }
+                                        },
+                                        onClick = { onAction(EditBookAction.SetLocation(location.locationName)) }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Box {
+                            TextField(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color.LightGray, MaterialTheme.shapes.small),
                                 value = state.selectedGenres.joinToString(" | "),
                                 onValueChange = {},
                                 label = { Text("Genres") },
@@ -245,83 +321,6 @@ fun EditBookScreen(
                                             }
                                         },
                                         onClick = { onAction(EditBookAction.SetGenre(updatedGenres)) }
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Box {
-                            TextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(Color.LightGray, MaterialTheme.shapes.small),
-                                value = state.selectedLocation,
-                                onValueChange = {},
-                                label = { Text("Location") },
-                                readOnly = true,
-                                trailingIcon = {
-                                    if (state.isLocationExpanded == false) {
-                                        IconButton(onClick = {
-                                            onAction(
-                                                EditBookAction.SetIsLocationExpanded(
-                                                    true
-                                                )
-                                            )
-                                        }) {
-                                            Icon(
-                                                Icons.Filled.KeyboardArrowDown,
-                                                contentDescription = "Locations list"
-                                            )
-                                        }
-                                    } else {
-                                        IconButton(onClick = {
-                                            onAction(
-                                                EditBookAction.SetIsLocationExpanded(
-                                                    false
-                                                )
-                                            )
-                                        }) {
-                                            Icon(
-                                                Icons.Filled.KeyboardArrowUp,
-                                                contentDescription = "Locations list"
-                                            )
-                                        }
-                                    }
-                                },
-                                placeholder = { Text("Select location") },
-                            )
-                            DropdownMenu(
-                                expanded = state.isLocationExpanded,
-                                onDismissRequest = { onAction(EditBookAction.SetIsLocationExpanded(false)) }
-                            ) {
-                                state.locations.forEach { location ->
-                                    DropdownMenuItem(
-                                        text = {
-                                            Row(
-                                                verticalAlignment = Alignment.CenterVertically,
-                                                horizontalArrangement = Arrangement.SpaceBetween
-                                            ) {
-                                                RadioButton(
-                                                    selected = state.selectedLocation == location.locationName,
-                                                    onClick = {
-                                                        onAction(
-                                                            EditBookAction.SetLocation(
-                                                                location.locationName
-                                                            )
-                                                        )
-                                                    }
-                                                )
-                                                Text(location.locationName)
-                                            }
-                                        },
-                                        onClick = { onAction(EditBookAction.SetLocation(location.locationName)) }
                                     )
                                 }
                             }

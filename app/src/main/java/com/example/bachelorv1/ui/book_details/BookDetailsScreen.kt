@@ -25,10 +25,8 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.List
-import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -175,7 +173,7 @@ fun BookDetailsScreen(
                     ) {
                         Icon(painterResource(R.drawable.playlist_remove_icon), contentDescription = "Remove from To Read list")
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "Remove from reading list", style = MaterialTheme.typography.labelMedium)
+                        Text(text = "Remove from To Read list", style = MaterialTheme.typography.labelMedium)
                     }
                 }
                 else {
@@ -186,7 +184,7 @@ fun BookDetailsScreen(
                     ) {
                         Icon(painterResource(R.drawable.playlist_add_icon), contentDescription = "Add to To Read list")
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "Add to reading list", style = MaterialTheme.typography.labelMedium)
+                        Text(text = "Add to To Read list", style = MaterialTheme.typography.labelMedium)
                     }
                 }
 
@@ -244,8 +242,8 @@ fun BookDetailsScreen(
                         Icon(painterResource(R.drawable.book_icon), contentDescription = "Book icon", tint = MaterialTheme.colorScheme.onSecondaryContainer)
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
-                            Text(text = "Title", color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.bodyMedium)
-                            Text(text = state.book?.bookTitle.toString(), style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(text = "Title", color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.bodyMedium, softWrap = false)
+                            Text(text = state.book?.bookTitle.toString(), color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         }
                     }
 
@@ -258,8 +256,8 @@ fun BookDetailsScreen(
                         Icon(painterResource(R.drawable.author_icon), contentDescription = "Author icon", tint = MaterialTheme.colorScheme.onSecondaryContainer)
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
-                            Text(text = "Author", style = MaterialTheme.typography.bodyMedium)
-                            Text(text = state.book?.bookAuthor.toString(), style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(text = "Author", color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.bodyMedium, softWrap = false)
+                            Text(text = state.book?.bookAuthor.toString(), color = MaterialTheme.colorScheme.onSecondaryContainer, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         }
                     }
 

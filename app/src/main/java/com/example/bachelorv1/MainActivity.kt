@@ -1,7 +1,6 @@
 package com.example.bachelorv1
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -20,7 +19,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -158,11 +156,7 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                 }
                                             },
-                                            actions = {
-                                                IconButton(onClick = {  }) {
-                                                    Icon(Icons.Default.MoreVert, contentDescription = "Export/import database")
-                                                }
-                                            },
+                                            actions = { ExportDropdownMenu() },
                                             colors = TopAppBarColors(
                                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                                                 scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -288,11 +282,7 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                 }
                                             },
-                                            actions = {
-                                                IconButton(onClick = {  }) {
-                                                    Icon(Icons.Default.MoreVert, contentDescription = "Export/import database")
-                                                }
-                                            },
+                                            actions = { ExportDropdownMenu() },
                                             colors = TopAppBarColors(
                                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                                                 scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -385,11 +375,7 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                 }
                                             },
-                                            actions = {
-                                                IconButton(onClick = {  }) {
-                                                    Icon(Icons.Default.MoreVert, contentDescription = "Export/import database")
-                                                }
-                                            },
+                                            actions = { ExportDropdownMenu() },
                                             colors = TopAppBarColors(
                                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                                                 scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -482,11 +468,7 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                 }
                                             },
-                                            actions = {
-                                                IconButton(onClick = {  }) {
-                                                    Icon(Icons.Default.MoreVert, contentDescription = "Export/import database")
-                                                }
-                                            },
+                                            actions = { ExportDropdownMenu() },
                                             colors = TopAppBarColors(
                                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                                                 scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,

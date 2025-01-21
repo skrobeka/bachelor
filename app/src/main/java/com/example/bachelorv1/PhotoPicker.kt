@@ -9,7 +9,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.OpenableColumns
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -147,7 +145,7 @@ private fun createImageUri(context: Context): Uri? {
     val contentResolver = context.contentResolver
     val imageCollection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     val imageDetails = ContentValues().apply {
-        put(MediaStore.Images.Media.DISPLAY_NAME, "camera_photo.jpg")
+        put(MediaStore.Images.Media.DISPLAY_NAME, "camera_photo" + System.currentTimeMillis().toString() + ".jpg")
         put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
     }
     return contentResolver.insert(imageCollection, imageDetails)
