@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [Book::class, Genre::class, Location::class, Picture::class, BookGenreCrossRef::class],
+    entities = [Book::class, Genre::class, Location::class, BookGenreCrossRef::class],
     version = 1
 )
 
@@ -15,7 +15,6 @@ abstract class AppDatabase: RoomDatabase() {
     abstract fun bookDao(): BookDao
     abstract fun locationDao(): LocationDao
     abstract fun genreDao(): GenreDao
-    //abstract val pictureDao: PictureDao
 
     companion object {
         @Volatile
