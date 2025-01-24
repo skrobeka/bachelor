@@ -7,7 +7,5 @@ import androidx.room.PrimaryKey
 data class Location(
     @PrimaryKey(autoGenerate = true)
     val locationId: Int = 0,
-    val parentLocationId: Int?,
-    val locationName: String,
-    val locationBookCount: Int = 0,
+    val locationName: String
 )

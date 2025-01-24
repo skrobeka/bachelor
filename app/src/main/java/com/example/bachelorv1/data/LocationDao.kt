@@ -1,32 +1,41 @@
 package com.example.bachelorv1.data
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LocationDao {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertLocation(location: Location)
+    fun insertLocation(location: Location)
 
     @Delete
-    suspend fun deleteLocation(location: Location)
+    fun deleteLocation(location: Location)
+
+    @Update
+    fun updateLocation(location: Location)
 
     //Queries
     @Query("SELECT * FROM location ORDER BY locationName ASC")
-    fun getAllLocationsOrderedByName(): LiveData<List<Location>>
+    fun getAllLocationsOrderedByName(): Flow<List<Location>>
 
-    @Query("SELECT * FROM location ORDER BY locationBookCount ASC")
-    fun getAllLocationsOrderedByBookCount(): LiveData<List<Location>>
+    @Query("SELECT * FROM location WHERE locationName LIKE '%' || :locationName || '%' ORDER BY locationName ASC")
+    fun getLocationByName(locationName: String): List<Location>
 
-    @Query("SELECT * FROM location WHERE locationName = :locationName ORDER BY locationName ASC")
-    fun getLocationByName(locationName: String): LiveData<Location>
+    @Query("SELECT locationId FROM location WHERE locationName = :locationName LIMIT 1")
+    fun getLocationIdByName(locationName: String): Int
 
-    @Query("SELECT * FROM location WHERE parentLocationId = :parentLocationId ORDER BY locationName ASC")
-    fun getLocationsByParent(parentLocationId: Int): LiveData<List<Location>>
+    @Query("SELECT * FROM location WHERE locationId = :locationId")
+    fun getLocationById(locationId: Int): Location
 
+    @Query("SELECT locationName FROM location WHERE locationId = :locationId")
+    fun getLocationNameById(locationId: Int): String
+
+    @Query("SELECT COUNT (*) FROM book WHERE locationId = :locationId")
+    fun getLocationBookCount(locationId: Int): Int
 }

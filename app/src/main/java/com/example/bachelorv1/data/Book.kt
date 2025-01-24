@@ -3,7 +3,6 @@ package com.example.bachelorv1.data
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.Date
 
 @Entity(tableName = "Book")
 data class Book(
@@ -12,7 +11,11 @@ data class Book(
     val bookTitle: String,
     val bookAuthor: String,
     val locationId: Int,
-    val bookAddedDate: Date = Date(),
-
-    @Embedded val picture: Picture? = null,
+    val bookIsRead: Boolean = false,
+    val bookIsFavorite: Boolean = false,
+    val bookIsOnReadingList: Boolean = false,
+    val bookAddedDate: String,
+    val bookNote: String? = null,
+    val bookCost: String? = null,
+    val bookPhoto: String? = null,
 )
