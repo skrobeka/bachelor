@@ -38,4 +38,9 @@ interface LocationDao {
 
     @Query("SELECT COUNT (*) FROM book WHERE locationId = :locationId")
     fun getLocationBookCount(locationId: Int): Int
+
+    //Import
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    fun insertLocations(locations: List<Location>)
+
 }

@@ -1,6 +1,5 @@
 package com.example.bachelorv1.ui.add_book
 
-import android.net.Uri
 import com.example.bachelorv1.data.Genre
 import com.example.bachelorv1.data.Location
 
@@ -16,6 +15,7 @@ data class AddBookState(
     val cost: String? = "",
     val isGenreExpanded: Boolean = false,
     val isLocationExpanded: Boolean = false,
+    val isPhotoSelected: Boolean = false,
     val isLoading: Boolean = false,
     val showError: Boolean = false
 )

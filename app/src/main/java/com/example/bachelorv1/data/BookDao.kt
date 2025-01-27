@@ -16,11 +16,20 @@ interface BookDao {
     fun deleteBook(book: Book)
 
     //Queries
-    @Query("UPDATE book SET bookPhoto = :newPhoto WHERE bookId = :bookId")
-    fun updateBookPhoto(bookId: Int, newPhoto: String)
+    @Query("SELECT * FROM book ORDER BY bookAuthor ASC")
+    fun getAllBooksOrderedByAuthor(): Flow<List<Book>>
 
     @Query("UPDATE book SET bookIsFavorite = :isFavorite WHERE bookId = :bookId")
     fun updateBookFavoriteStatus(bookId: Int, isFavorite: Boolean)
+
+    @Query("SELECT * FROM book WHERE bookIsFavorite = 1 ORDER BY bookTitle ASC")
+    fun getFavoriteBooks(): Flow<List<Book>>
+
+    @Query("SELECT * FROM book WHERE bookIsOnReadingList = 1 ORDER BY bookTitle ASC")
+    fun getReadingListBooks(): Flow<List<Book>>
+
+    @Query("UPDATE book SET bookPhoto = :newPhoto WHERE bookId = :bookId")
+    fun updateBookPhoto(bookId: Int, newPhoto: String)
 
     @Query("UPDATE book SET bookIsOnReadingList = :isOnReadingList WHERE bookId = :bookId")
     fun updateBookReadingListStatus(bookId: Int, isOnReadingList: Boolean)
@@ -51,9 +60,6 @@ interface BookDao {
 
     @Query("SELECT * FROM book ORDER BY bookAddedDate ASC")
     fun getAllBooksOrderedByAddedDate(): Flow<List<Book>>
-
-    @Query("SELECT * FROM book ORDER BY bookAuthor ASC")
-    fun getAllBooksOrderedByAuthor(): Flow<List<Book>>
 
     @Query("SELECT * FROM book WHERE bookTitle LIKE '%' || :bookTitle || '%' ORDER BY bookTitle ASC")
     fun getBookByTitle(bookTitle: String): List<Book>
@@ -88,13 +94,14 @@ interface BookDao {
     @Query("SELECT bookIsRead FROM book WHERE bookId = :bookId")
     fun isBookRead(bookId: Int): Flow<Boolean>
 
-    @Query("SELECT * FROM book WHERE bookIsFavorite = 1 ORDER BY bookTitle ASC")
-    fun getFavoriteBooks(): Flow<List<Book>>
-
-    @Query("SELECT * FROM book WHERE bookIsOnReadingList = 1 ORDER BY bookTitle ASC")
-    fun getReadingListBooks(): Flow<List<Book>>
+    @Query("SELECT bookPhoto FROM book WHERE bookId = :bookId")
+    fun getBookPhotoById(bookId: Int): String
 
     @Transaction
     @Query("SELECT genreId FROM bookgenre WHERE bookId = :bookId")
     fun getBookWithGenres(bookId: Int): List<Int>
+
+    //Import
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    fun insertBooks(books: List<Book>)
 }

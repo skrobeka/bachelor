@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [Book::class, Genre::class, Location::class, BookGenreCrossRef::class],
-    version = 1
+    version = 1,
 )
 
 abstract class AppDatabase: RoomDatabase() {
@@ -28,6 +28,7 @@ abstract class AppDatabase: RoomDatabase() {
                     "app_database"
                 )
                 .allowMainThreadQueries()
+                .setJournalMode(JournalMode.TRUNCATE)
                 .build()
             }
         }

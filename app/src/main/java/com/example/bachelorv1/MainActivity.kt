@@ -36,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -84,41 +85,7 @@ class MainActivity : ComponentActivity() {
                         val isFirstLaunch = sharedPreferences.getBoolean("is_first_launch", true)
                         if (isFirstLaunch) {
                             sharedPreferences.edit().putBoolean("is_first_launch", false).apply()
-                            listOf(
-                                "Fantasy",
-                                "Science fiction",
-                                "Distopian",
-                                "Action & Adventure",
-                                "Mystery",
-                                "Horror",
-                                "Thriller & Suspense",
-                                "Historical fiction",
-                                "Romance",
-                                "Contemporary fiction",
-                                "Literary fiction",
-                                "Magical realism",
-                                "Graphic novel",
-                                "Comics",
-                                "Short story",
-                                "Young adult",
-                                "New adult",
-                                "Memoir & Autobiography",
-                                "Biography",
-                                "Food & Drink",
-                                "Art & Photography",
-                                "Self-help",
-                                "History",
-                                "Travel",
-                                "True crime",
-                                "Humor",
-                                "Essays",
-                                "Guides/How-to",
-                                "Religion & Spirituality",
-                                "Humanities & Social sciences",
-                                "Parentinig & Families",
-                                "Science & Technology",
-                                "Children"
-                            ).forEach {
+                            genres.forEach {
                                 db.genreDao().insertGenre(Genre(genreName = it))
                             }
                             navController.navigate(Route.AddLocation)
@@ -156,7 +123,7 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                 }
                                             },
-                                            actions = { ExportDropdownMenu() },
+                                            actions = { ExportDropdownMenu(LocalContext.current) },
                                             colors = TopAppBarColors(
                                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                                                 scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -282,7 +249,7 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                 }
                                             },
-                                            actions = { ExportDropdownMenu() },
+                                            actions = { ExportDropdownMenu(LocalContext.current) },
                                             colors = TopAppBarColors(
                                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                                                 scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -375,7 +342,7 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                 }
                                             },
-                                            actions = { ExportDropdownMenu() },
+                                            actions = { ExportDropdownMenu(LocalContext.current) },
                                             colors = TopAppBarColors(
                                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                                                 scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -468,7 +435,7 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                 }
                                             },
-                                            actions = { ExportDropdownMenu() },
+                                            actions = { ExportDropdownMenu(this@MainActivity) },
                                             colors = TopAppBarColors(
                                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                                                 scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -731,3 +698,39 @@ inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(
     }
     return viewModel(parentEntry)
 }
+
+val genres = listOf(
+    "Fantasy",
+    "Science fiction",
+    "Distopian",
+    "Action & Adventure",
+    "Mystery",
+    "Horror",
+    "Thriller & Suspense",
+    "Historical fiction",
+    "Romance",
+    "Contemporary fiction",
+    "Literary fiction",
+    "Magical realism",
+    "Graphic novel",
+    "Comics",
+    "Short story",
+    "Young adult",
+    "New adult",
+    "Memoir & Autobiography",
+    "Biography",
+    "Food & Drink",
+    "Art & Photography",
+    "Self-help",
+    "History",
+    "Travel",
+    "True crime",
+    "Humor",
+    "Essays",
+    "Guides/How-to",
+    "Religion & Spirituality",
+    "Humanities & Social sciences",
+    "Parentinig & Families",
+    "Science & Technology",
+    "Children"
+)

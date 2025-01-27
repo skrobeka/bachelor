@@ -1,7 +1,5 @@
 package com.example.bachelorv1.ui.add_book
 
-import android.net.Uri
-
 sealed interface AddBookAction {
     object OnBackClick : AddBookAction
     object OnBookSave : AddBookAction
@@ -15,4 +13,5 @@ sealed interface AddBookAction {
     data class SetCost(val cost: String) : AddBookAction
     data class SetIsGenreExpanded(val isExpanded: Boolean) : AddBookAction
     data class SetIsLocationExpanded(val isExpanded: Boolean) : AddBookAction
+    data class SetIsPhotoSelected(val isSelected: Boolean) : AddBookAction
 }

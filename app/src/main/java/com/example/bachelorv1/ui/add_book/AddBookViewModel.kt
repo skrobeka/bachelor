@@ -47,6 +47,7 @@ class AddBookViewModel(
             is AddBookAction.SetNote -> _state.update { it.copy(note = action.note) }
             is AddBookAction.SetIsGenreExpanded -> _state.update { it.copy(isGenreExpanded = action.isExpanded) }
             is AddBookAction.SetIsLocationExpanded -> _state.update { it.copy(isLocationExpanded = action.isExpanded) }
+            is AddBookAction.SetIsPhotoSelected -> _state.update { it.copy(isPhotoSelected = action.isSelected) }
             is AddBookAction.SetCost -> _state.update { it.copy(cost = action.cost) }
             is AddBookAction.SaveBook -> {
                 if (state.value.title.isBlank() || state.value.author.isBlank() || state.value.selectedLocation.isBlank()) {
