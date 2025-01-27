@@ -1,7 +1,6 @@
 package com.example.bachelorv1
 
 import android.graphics.BitmapFactory
-import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -22,6 +21,4 @@ fun readTextFromPicture(filePath: String, callback: (String) -> Unit) {
     result.addOnFailureListener { e ->
         callback("Error reading text from image")
     }
-
-    return
 }
